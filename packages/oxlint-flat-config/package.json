@@ -1,0 +1,33 @@
+{
+  "name": "oxlint-flat-config",
+  "version": "0.0.0",
+  "description": "Compose oxlint configs from ESLint-style flat config arrays.",
+  "homepage": "https://github.com/liangmiQwQ/oxlint-flat-config#readme",
+  "bugs": {
+    "url": "https://github.com/liangmiQwQ/oxlint-flat-config/issues"
+  },
+  "license": "MIT",
+  "author": "Liang Mi <hi@liangmi.dev>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liangmiQwQ/oxlint-flat-config.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp run cpack",
+    "check": "vp run ccheck",
+    "dev": "vp pack --watch",
+    "prepublishOnly": "vp run build",
+    "test": "vp run ctest"
+  }
+}
