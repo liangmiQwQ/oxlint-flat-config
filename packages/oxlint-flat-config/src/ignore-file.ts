@@ -17,6 +17,8 @@ const DEFAULT_NAME = 'Imported .gitignore patterns'
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/ignore-file.js
 /**
  * Reads a gitignore-style file (e.g. `.gitignore`) and converts its patterns into a flat config object with `ignores`.
+ *
+ * For Oxlint, it automatically excludes files listed in `.gitignore` by default, so there is usually no need to specify them again.
  */
 export function includeIgnoreFile(
   ignoreFilePath: string,
