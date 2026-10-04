@@ -16,9 +16,8 @@ export function globalIgnores(ignorePatterns: string[], name?: string): GlobalIg
   const id = globalIgnoreCount++
 
   return {
-    // `||` instead of `??` to stay consistent with ESLint, so an empty name also falls back to the generated one.
-    // oxlint-disable-next-line typescript/prefer-nullish-coalescing
-    name: name || `globalIgnores ${id}`,
+    // https://github.com/eslint/rewrite/pull/521
+    name: name ?? `globalIgnores ${id}`,
     ignores: ignorePatterns
   }
 }
