@@ -1,3 +1,7 @@
+// Ported from ESLint's `@eslint/config-helpers`, Copyright OpenJS Foundation and other contributors, Apache-2.0 licensed:
+// https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/ignore-file.js
+// https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/LICENSE
+
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -15,8 +19,6 @@ const DEFAULT_NAME = 'Imported .gitignore patterns'
 
 /**
  * Reads a gitignore-style file (e.g. `.gitignore`) and converts its patterns into a flat config object with `ignores`.
- *
- * Follows `includeIgnoreFile` from `eslint/config`.
  */
 export function includeIgnoreFile(
   ignoreFilePath: string,
