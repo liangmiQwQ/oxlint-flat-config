@@ -1,3 +1,1 @@
-export function defineConfig(): never {
-  throw new Error('Not implemented yet')
-}
+export { defineConfig } from "./define/index.ts";
