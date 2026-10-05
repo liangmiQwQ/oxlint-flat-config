@@ -29,5 +29,11 @@
     "dev": "vp pack --watch",
     "prepublishOnly": "vp run build",
     "test": "vp run ctest"
+  },
+  "devDependencies": {
+    "oxlint": "catalog:"
+  },
+  "peerDependencies": {
+    "oxlint": ">=1.85.0"
   }
 }
