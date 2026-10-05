@@ -15,15 +15,10 @@ import type {
  * - no `files`: merged into the root config
  * - with `files`: becomes an `overrides` entry, where `ignores` becomes `excludeFiles`
  */
-export type FlatConfigItem = GlobalConfigItem | ScopedConfigItem
+export type FlatConfigItem = GlobalIgnoresItem | GlobalConfigItem | ScopedConfigItem
 
 /** Applies to every file. The only item kind that may carry oxlint's root-only fields. */
 export interface GlobalConfigItem extends BaseConfigItem {
-  // `never` keeps the union discriminated: an object with `files` can only be a `ScopedConfigItem`.
-  files?: never
-  /** Glob patterns to ignore globally. */
-  ignores?: string[]
-
   categories?: RuleCategories
   settings?: OxlintConfig['settings']
   options?: OxlintConfig['options']
@@ -35,16 +30,12 @@ export interface ScopedConfigItem extends BaseConfigItem {
   files: string[]
   /** Glob patterns excluded from this config. They are not ignored globally. */
   ignores?: string[]
-
-  // Root-only in oxlint. Declared as `never` so TypeScript rejects them here instead of silently accepting them.
-  categories?: never
-  settings?: never
-  options?: never
 }
 
-/** The `{ name, ignores }` shape produced by `globalIgnores` and `includeIgnoreFile`. */
+/** Ignore files globally. Create with `globalIgnores` and `includeIgnoreFile`. */
 export interface GlobalIgnoresItem {
-  name: string
+  name?: string
+  basePath?: string
   ignores: string[]
 }
 
