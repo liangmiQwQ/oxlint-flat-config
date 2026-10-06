@@ -1,14 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import type { GlobalIgnoresItem } from './core/types.ts'
+
 export interface IncludeIgnoreFileOptions {
   /** The name to give the output config object(s). */
   name?: string
-}
-
-export interface IgnoreFileConfig {
-  name: string
-  ignores: string[]
 }
 
 const DEFAULT_NAME = 'Imported .gitignore patterns'
@@ -23,15 +20,15 @@ const DEFAULT_NAME = 'Imported .gitignore patterns'
 export function includeIgnoreFile(
   ignoreFilePath: string,
   options?: IncludeIgnoreFileOptions | string
-): IgnoreFileConfig
+): GlobalIgnoresItem
 export function includeIgnoreFile(
   ignoreFilePaths: string[],
   options?: IncludeIgnoreFileOptions | string
-): IgnoreFileConfig[]
+): GlobalIgnoresItem[]
 export function includeIgnoreFile(
   ignoreFilePathArg: string | string[],
   options?: IncludeIgnoreFileOptions | string
-): IgnoreFileConfig | IgnoreFileConfig[] {
+): GlobalIgnoresItem | GlobalIgnoresItem[] {
   const name = parseName(options)
 
   if (!Array.isArray(ignoreFilePathArg)) {

@@ -1,14 +1,11 @@
-export interface GlobalIgnoresConfig {
-  name: string
-  ignores: string[]
-}
+import type { GlobalIgnoresItem } from './core/types.ts'
 
 // Used to give unnamed global ignores a unique name, same as ESLint's `globalIgnores`.
 let globalIgnoreCount = 0
 
 // Ported from ESLint's `@eslint/config-helpers`:
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/global-ignores.js#L29-L44
-export function globalIgnores(ignorePatterns: string[], name?: string): GlobalIgnoresConfig {
+export function globalIgnores(ignorePatterns: string[], name?: string): GlobalIgnoresItem {
   if (ignorePatterns.length === 0) {
     throw new TypeError('ignorePatterns must contain at least one pattern')
   }
