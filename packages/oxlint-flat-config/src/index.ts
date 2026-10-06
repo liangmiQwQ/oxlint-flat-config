@@ -1,6 +1,8 @@
 export {
   type ConfigInput,
   defineConfig,
+  type ExtendsInput,
+  type ExtendsItem,
   type FlatConfigItem,
   type GlobalConfigItem,
   type GlobalIgnoresItem,

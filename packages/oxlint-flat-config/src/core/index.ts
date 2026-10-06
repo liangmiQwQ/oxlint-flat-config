@@ -4,6 +4,8 @@ import type { ConfigInput } from './types.ts'
 
 export type {
   ConfigInput,
+  ExtendsInput,
+  ExtendsItem,
   FlatConfigItem,
   GlobalConfigItem,
   GlobalIgnoresItem,
