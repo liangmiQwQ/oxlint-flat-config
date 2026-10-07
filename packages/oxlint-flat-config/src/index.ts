@@ -1,3 +1,4 @@
+export { category, type CategoryOptions, type ScopedCategoryOptions } from './category.ts'
 export {
   type ConfigInput,
   defineConfig,

@@ -30,6 +30,9 @@
     "prepublishOnly": "vp run build",
     "test": "vp run ctest"
   },
+  "dependencies": {
+    "get-oxlint-rules": "catalog:"
+  },
   "devDependencies": {
     "oxlint": "catalog:"
   },
