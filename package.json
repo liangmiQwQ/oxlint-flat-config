@@ -2,7 +2,7 @@
   "name": "oxlint-flat-config-monorepo",
   "version": "0.0.0",
   "private": true,
-  "description": "Compose oxlint configs from ESLint-style flat config arrays.",
+  "description": "Compose Oxlint configs from ESLint-style flat config arrays.",
   "homepage": "https://github.com/liangmiQwQ/oxlint-flat-config#readme",
   "bugs": {
     "url": "https://github.com/liangmiQwQ/oxlint-flat-config/issues"

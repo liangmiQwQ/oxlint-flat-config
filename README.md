@@ -1,6 +1,6 @@
 # oxlint-flat-config
 
-Compose oxlint configs from ESLint-style flat config arrays.
+Compose Oxlint configs from ESLint-style flat config arrays.
 
 ## License
 

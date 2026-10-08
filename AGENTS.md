@@ -1,6 +1,6 @@
 # oxlint-flat-config Agent Guide
 
-oxlint-flat-config lets users compose oxlint configs from ESLint-style flat config arrays. It is for projects that use oxlint and want to build their config from reusable pieces, the way ESLint flat configs work.
+oxlint-flat-config lets users compose Oxlint configs from ESLint-style flat config arrays. It is for projects that use Oxlint and want to build their config from reusable pieces, the way ESLint flat configs work.
 
 ## Toolchain
 

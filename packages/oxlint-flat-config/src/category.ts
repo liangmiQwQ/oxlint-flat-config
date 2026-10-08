@@ -14,11 +14,11 @@ export interface ScopedCategoryOptions extends CategoryOptions {
   ignores?: string[]
 }
 
-// Shared by every `category()` call, so oxlint runs at most once per process.
+// Shared by every `category()` call, so Oxlint runs at most once per process.
 let rulesPromise: Promise<OxlintRule[]> | undefined
 
 /**
- * Turns oxlint categories into a flat config object with an explicit rule for every rule in them.
+ * Turns Oxlint categories into a flat config object with an explicit rule for every rule in them.
  *
  * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
  */
@@ -44,7 +44,7 @@ export async function category(
 }
 
 function loadRules(): Promise<OxlintRule[]> {
-  // Resolve oxlint from this package, which declares it as a peer dependency, so pnpm's strict layout can't hide it.
+  // Resolve Oxlint from this package, which declares it as a peer dependency, so pnpm's strict layout can't hide it.
   rulesPromise ??= getRules({ cwd: import.meta.dirname })
   return rulesPromise
 }
@@ -57,6 +57,6 @@ function toRuleMap(rules: OxlintRule[], categories: RuleCategories): DummyRuleMa
 }
 
 function toRuleKey(rule: OxlintRule): string {
-  // `oxlint --rules` reports scopes like `jsx_a11y`, while configs name the plugin `jsx-a11y`.
+  // `Oxlint --rules` reports scopes like `jsx_a11y`, while configs name the plugin `jsx-a11y`.
   return `${rule.scope.replaceAll('_', '-')}/${rule.value}`
 }
