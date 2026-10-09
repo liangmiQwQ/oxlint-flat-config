@@ -2,8 +2,7 @@ import { expect, it } from 'vite-plus/test'
 
 import { defineConfig } from '../src/index.ts'
 
+// TODO: test building global ignores, root fields and overrides
 it('defineConfig', () => {
-  expect(() => {
-    defineConfig()
-  }).toThrow('Not implemented yet')
+  expect(defineConfig()).toEqual({})
 })

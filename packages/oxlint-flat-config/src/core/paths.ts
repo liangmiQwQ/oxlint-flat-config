@@ -15,14 +15,14 @@ export interface OverridePaths {
   excludeFiles: string[]
 }
 
-// TODO: test through `defineConfig` once it returns a config
+// TODO: test through `defineConfig`
 /** Converts global ignores into gitignore patterns for Oxlint's `ignorePatterns`. */
 export function toIgnorePatterns(item: GlobalIgnoresItem): string[] {
   const basePath = normalizeBasePath(item)
   return item.ignores.map(pattern => toIgnorePattern(pattern, basePath))
 }
 
-// TODO: test through `defineConfig` once it returns a config
+// TODO: test through `defineConfig`
 /**
  * Converts `files`, `ignores` and `basePath` into fast-glob patterns for Oxlint's `overrides`.
  *
