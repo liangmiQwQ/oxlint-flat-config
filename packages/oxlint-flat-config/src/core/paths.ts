@@ -37,7 +37,7 @@ export function toOverridePaths(item: PathFields): OverridePaths[] {
   // 1. Turn every `files` entry into one AND group. ESLint never matches files outside `basePath`.
   const scope = basePath ? [joinBasePath('**', basePath)] : []
   // oxlint-disable-next-line oxc/no-map-spread -- A group has only a few patterns, and spreading reads clearer than `concat`.
-  const groups = (item.files ?? [[]]).map(entry => [
+  const groups = (item.files ?? ['**/*']).map(entry => [
     ...scope,
     ...[entry].flat().map(pattern => joinBasePath(pattern, basePath))
   ])

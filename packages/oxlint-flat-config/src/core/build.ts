@@ -3,9 +3,11 @@ import type { OxlintConfig, OxlintOverride } from 'oxlint'
 import type { ExpandedConfigItem } from './extends.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
 import { toIgnorePatterns, toOverridePaths } from './paths.ts'
-import type { GlobalConfigItem, GlobalIgnoresItem } from './types.ts'
+import type { GlobalIgnoresItem } from './types.ts'
 
 type ConfigItem = Exclude<ExpandedConfigItem, GlobalIgnoresItem>
+type RootFields = Pick<OxlintConfig, 'categories' | 'settings' | 'options'>
+type OverrideFields = Omit<OxlintOverride, 'files' | 'excludeFiles'>
 
 // Oxlint only reads these fields in the root config, not in `overrides`.
 const ROOT_ONLY_KEYS = new Set(['categories', 'settings', 'options'])
@@ -28,49 +30,51 @@ function addItem(config: OxlintConfig, item: ExpandedConfigItem): OxlintConfig {
     }
   }
 
-  // A config without `files` applies to every file in its `basePath`, which is every file when `basePath` is unset.
-  if (!('files' in item) && item.basePath === undefined) {
-    return mergeIntoRoot(config, item)
+  return addOverrides(mergeIntoRoot(config, item), item)
+}
+
+// Same as ESLint, a later item wins key by key.
+function mergeIntoRoot(config: OxlintConfig, item: ConfigItem): OxlintConfig {
+  const { categories, settings, options } = toRootFields(item)
+  return withoutUndefined({
+    ...config,
+    categories: mergeRecords(config.categories, categories),
+    settings: mergeRecords(config.settings, settings),
+    options: mergeRecords(config.options, options)
+  })
+}
+
+// Oxlint applies every override after the root config, so other fields go into `overrides` to keep the item order.
+function addOverrides(config: OxlintConfig, item: ConfigItem): OxlintConfig {
+  const fields = toOverrideFields(item)
+  if (Object.keys(fields).length === 0) {
+    return config
   }
 
-  const fields = toOverrideFields(item)
   // oxlint-disable-next-line oxc/no-map-spread -- An item usually makes one override, and each override needs its own object.
   const overrides = toOverridePaths(item).map(paths => ({ ...paths, ...fields }))
   return { ...config, overrides: [...(config.overrides ?? []), ...overrides] }
 }
 
-// Same as ESLint, a later item wins key by key, and plugins add up instead of replacing the earlier ones.
-function mergeIntoRoot(
-  config: OxlintConfig,
-  item: Omit<GlobalConfigItem, 'extends'>
-): OxlintConfig {
-  return withoutUndefined({
-    ...config,
-    plugins: mergeLists(config.plugins, item.plugins),
-    jsPlugins: mergeLists(config.jsPlugins ?? undefined, item.jsPlugins),
-    rules: mergeRecords(config.rules, item.rules),
-    env: mergeRecords(config.env, item.env),
-    globals: mergeRecords(config.globals, item.globals),
-    categories: mergeRecords(config.categories, item.categories),
-    settings: mergeRecords(config.settings, item.settings),
-    options: mergeRecords(config.options, item.options)
-  })
-}
+function toRootFields(item: ConfigItem): RootFields {
+  // A config without `files` applies to every file in its `basePath`, which is every file when `basePath` is unset.
+  if (!('files' in item) && item.basePath === undefined) {
+    const { categories, settings, options } = item
+    return { categories, settings, options }
+  }
 
-function toOverrideFields(item: ConfigItem): Omit<OxlintOverride, 'files' | 'excludeFiles'> {
   const rootOnlyKey = Object.keys(item).find(key => ROOT_ONLY_KEYS.has(key))
   if (rootOnlyKey) {
     throw new TypeError(
-      `'${rootOnlyKey}' is not allowed in "${item.name ?? 'unnamed config'}" with 'basePath', Oxlint only reads it in the root config.`
+      `'${rootOnlyKey}' is not allowed in "${item.name ?? 'unnamed config'}" with 'files' or 'basePath', Oxlint only reads it in the root config.`
     )
   }
-
-  const { plugins, jsPlugins, rules, env, globals } = item
-  return withoutUndefined({ plugins, jsPlugins, rules, env, globals })
+  return {}
 }
 
-function mergeLists<T>(base: T[] | undefined, next: T[] | undefined): T[] | undefined {
-  return base && next ? [...new Set([...base, ...next])] : (next ?? base)
+function toOverrideFields(item: ConfigItem): OverrideFields {
+  const { plugins, jsPlugins, rules, env, globals } = item
+  return withoutUndefined({ plugins, jsPlugins, rules, env, globals })
 }
 
 function mergeRecords<T extends object>(base: T | undefined, next: T | undefined): T | undefined {
