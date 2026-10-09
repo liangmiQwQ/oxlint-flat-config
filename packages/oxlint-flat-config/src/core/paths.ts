@@ -3,41 +3,56 @@ import path from 'node:path'
 import { distribute } from 'glob-distribute'
 import type { DistributeResult } from 'glob-distribute'
 
-import type { ExpandedConfigItem } from './extends.ts'
-import { isGlobalIgnores } from './global-ignores.ts'
-import type { GlobalConfigItem, GlobalIgnoresItem, ScopedConfigItem } from './types.ts'
+import type { GlobalIgnoresItem, ScopedConfigItem } from './types.ts'
 
-/** A config item whose patterns follow Oxlint's syntax and are relative to the config file's directory. */
-export type OxlintPathItem =
-  | Omit<GlobalIgnoresItem, 'basePath'>
-  | Omit<GlobalConfigItem, 'extends' | 'basePath'>
-  | (Omit<ScopedConfigItem, 'extends' | 'basePath' | 'files'> & { files: string[] })
+/** The path fields of a config item. A config item without `files` applies to every file in its `basePath`. */
+type PathFields = Pick<ScopedConfigItem, 'name' | 'basePath' | 'ignores'> &
+  Partial<Pick<ScopedConfigItem, 'files'>>
 
-type MatchedItem = Omit<GlobalConfigItem, 'extends' | 'basePath'> &
-  Pick<ScopedConfigItem, 'ignores'>
+/** Patterns for one Oxlint override, relative to the config file's directory. */
+export interface OverridePaths {
+  files: string[]
+  excludeFiles: string[]
+}
+
+// TODO: test through `defineConfig` once it returns a config
+/** Converts global ignores into gitignore patterns for Oxlint's `ignorePatterns`. */
+export function toIgnorePatterns(item: GlobalIgnoresItem): string[] {
+  const basePath = normalizeBasePath(item)
+  return item.ignores.map(pattern => toIgnorePattern(pattern, basePath))
+}
 
 // TODO: test through `defineConfig` once it returns a config
 /**
- * Rewrites ESLint-style `files`, `ignores` and `basePath` into Oxlint-style patterns relative to the config file's directory.
+ * Converts `files`, `ignores` and `basePath` into fast-glob patterns for Oxlint's `overrides`.
  *
- * - Global ignores become gitignore patterns, for Oxlint's `ignorePatterns`.
- * - Other `files` and `ignores` become fast-glob patterns, for `overrides[].files` and `excludeFiles`.
+ * Usually returns one entry. AND groups in `files` can need more, since their exclusions apply to the whole override.
  */
-export function toOxlintPaths(item: ExpandedConfigItem): OxlintPathItem[] {
-  const basePath = normalizeBasePath(item.basePath, item.name)
+export function toOverridePaths(item: PathFields): OverridePaths[] {
+  const basePath = normalizeBasePath(item)
+  const ignores = (item.ignores ?? []).map(pattern =>
+    toExcludePattern(pattern, basePath, item.name)
+  )
 
-  if (isGlobalIgnores(item)) {
-    return [{ ...omitBasePath(item), ignores: item.ignores.map(p => toIgnorePattern(p, basePath)) }]
-  }
-  if ('files' in item) {
-    return matchFiles(omitBasePath(item), item.files, basePath)
-  }
+  // 1. Turn every `files` entry into one AND group. ESLint never matches files outside `basePath`.
+  const scope = basePath ? [joinBasePath('**', basePath)] : []
+  // oxlint-disable-next-line oxc/no-map-spread -- A group has only a few patterns, and spreading reads clearer than `concat`.
+  const groups = (item.files ?? [[]]).map(entry => [
+    ...scope,
+    ...[entry].flat().map(pattern => joinBasePath(pattern, basePath))
+  ])
 
-  // ESLint applies a config without `files` only inside its `basePath`.
-  return basePath ? matchFiles(omitBasePath(item), [[]], basePath) : [omitBasePath(item)]
+  // 2. Oxlint can't AND patterns, so distribute each group into patterns to include and patterns to exclude.
+  const results = groups.map(group => distribute(group)).filter(result => result.include.length > 0)
+
+  // 3. Only groups with the same exclusions can share an override.
+  return groupByExclude(results).map(({ include, exclude }) => ({
+    files: include.map(toGlobPattern),
+    excludeFiles: [...exclude.map(toGlobPattern), ...ignores]
+  }))
 }
 
-function normalizeBasePath(basePath: string | undefined, name = 'unnamed config'): string {
+function normalizeBasePath({ basePath, name = 'unnamed config' }: PathFields): string {
   if (basePath === undefined) {
     return ''
   }
@@ -56,39 +71,6 @@ function normalizeBasePath(basePath: string | undefined, name = 'unnamed config'
   }
 
   return normalized === '.' ? '' : normalized
-}
-
-function omitBasePath<T extends { basePath?: string }>(item: T): Omit<T, 'basePath'> {
-  const { basePath: _, ...rest } = item
-  return rest
-}
-
-function matchFiles(
-  item: MatchedItem,
-  files: ScopedConfigItem['files'],
-  basePath: string
-): OxlintPathItem[] {
-  const { ignores = [], ...rest } = item
-  const excludeFiles = ignores.map(pattern => toExcludePattern(pattern, basePath, item.name))
-
-  // 1. Turn every `files` entry into one AND group. ESLint never matches files outside `basePath`.
-  const groups = files.map(entry => [
-    ...(basePath ? [joinBasePath('**', basePath)] : []),
-    ...[entry].flat().map(pattern => joinBasePath(pattern, basePath))
-  ])
-
-  // 2. Oxlint can't AND patterns, so distribute each group into patterns to include and patterns to exclude.
-  const results = groups.map(group => distribute(group)).filter(result => result.include.length > 0)
-
-  // 3. Exclusions apply to the whole override, so only groups with the same exclusions can share one.
-  // oxlint-disable-next-line oxc/no-map-spread -- Each override needs its own copy of `rest`.
-  return groupByExclude(results).map(({ include, exclude }) => ({
-    ...rest,
-    files: include.map(toGlobPattern),
-    ...(exclude.length + excludeFiles.length > 0 && {
-      ignores: [...exclude.map(toGlobPattern), ...excludeFiles]
-    })
-  }))
 }
 
 function toExcludePattern(pattern: string, basePath: string, name = 'unnamed config'): string {
