@@ -12,7 +12,6 @@ type OverrideFields = Omit<OxlintOverride, 'files' | 'excludeFiles'>
 // Oxlint only reads these fields in the root config, not in `overrides`.
 const ROOT_ONLY_KEYS = new Set(['categories', 'settings', 'options'])
 
-// TODO: test through `defineConfig`
 /** Builds an Oxlint config from flat config items, following their order. */
 export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {
   let config: OxlintConfig = {}
