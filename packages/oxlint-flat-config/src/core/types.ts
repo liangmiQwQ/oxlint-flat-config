@@ -12,7 +12,7 @@ import type {
  *
  * How it maps onto `OxlintConfig`:
  * - only `ignores` (plus optional `name`): a global ignore, goes into `ignorePatterns`
- * - no `files`: merged into the root config
+ * - no `files`: `categories`, `settings` and `options` are merged into the root config, the rest becomes an `overrides` entry for every file
  * - with `files`: becomes an `overrides` entry, where `ignores` becomes `excludeFiles`
  */
 export type FlatConfigItem = GlobalIgnoresItem | GlobalConfigItem | ScopedConfigItem
