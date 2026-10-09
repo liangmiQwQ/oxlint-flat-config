@@ -76,12 +76,18 @@ function getIgnores(item: ExtendsItem): string[] {
 }
 
 function extendFiles(baseFiles: Files, extension: ExtendsItem): Files {
-  if (!('files' in extension)) {
+  const extensionFiles = 'files' in extension ? extension.files : []
+
+  // Same as ESLint, an empty side doesn't narrow the other one.
+  if (extensionFiles.length === 0) {
     return baseFiles
+  }
+  if (baseFiles.length === 0) {
+    return extensionFiles
   }
 
   // A file must match both, so pair every base entry with every extension entry as an AND group.
   return baseFiles.flatMap(baseEntry =>
-    extension.files.map(extensionEntry => [baseEntry, extensionEntry].flat())
+    extensionFiles.map(extensionEntry => [baseEntry, extensionEntry].flat())
   )
 }
