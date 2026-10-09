@@ -31,7 +31,8 @@
     "test": "vp run ctest"
   },
   "dependencies": {
-    "get-oxlint-rules": "catalog:"
+    "get-oxlint-rules": "catalog:",
+    "glob-distribute": "catalog:"
   },
   "devDependencies": {
     "oxlint": "catalog:"

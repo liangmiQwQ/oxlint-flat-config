@@ -67,3 +67,24 @@ it('rejects nested `extends`', () => {
     `Nested 'extends' is not allowed in "base > ExtendedConfig[0]".`
   )
 })
+
+it("gives extended configs the config's `basePath`", () => {
+  const configs: ConfigInput[] = [
+    { basePath: 'packages/a', extends: [{ ignores: ['dist/**'] }, { rules: {} }], rules: {} }
+  ]
+
+  expect(flattenConfigs(configs)).toEqual([
+    { name: 'UserConfig[0] > ExtendedConfig[0]', basePath: 'packages/a', ignores: ['dist/**'] },
+    { name: 'UserConfig[0] > ExtendedConfig[1]', basePath: 'packages/a', rules: {} },
+    { basePath: 'packages/a', rules: {} }
+  ])
+})
+
+it('rejects `basePath` in extended configs', () => {
+  // Types forbid this, but plain JS configs can still set it.
+  const extension = { basePath: 'packages/a', rules: {} } as never
+
+  expect(() => flattenConfigs([{ name: 'base', extends: [extension] }])).toThrow(
+    `'basePath' is not allowed in "base > ExtendedConfig[0]"`
+  )
+})

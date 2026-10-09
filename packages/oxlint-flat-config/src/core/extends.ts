@@ -1,6 +1,18 @@
 import { flatTraverse } from './flat-traverse.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
-import type { ExtendsItem, FlatConfigItem, ScopedConfigItem } from './types.ts'
+import type {
+  ExtendsItem,
+  FlatConfigItem,
+  GlobalConfigItem,
+  GlobalIgnoresItem,
+  ScopedConfigItem
+} from './types.ts'
+
+/** A config item with its `extends` expanded. Unlike `ExtendsItem`, it keeps `basePath`. */
+export type ExpandedConfigItem =
+  | Omit<GlobalConfigItem, 'extends'>
+  | Omit<ScopedConfigItem, 'extends'>
+  | GlobalIgnoresItem
 
 type Files = ScopedConfigItem['files']
 
@@ -8,10 +20,8 @@ type Files = ScopedConfigItem['files']
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/define-config.js#L376-L469
 /**
  * Replaces `extends` with the extended configs, placed before the config itself.
- *
- * The result has no `extends` left, so it has the same shape as `ExtendsItem`.
  */
-export function expandExtends(config: FlatConfigItem, configName: string): ExtendsItem[] {
+export function expandExtends(config: FlatConfigItem, configName: string): ExpandedConfigItem[] {
   if (!('extends' in config) || config.extends === undefined) {
     return [config]
   }
@@ -25,19 +35,35 @@ export function expandExtends(config: FlatConfigItem, configName: string): Exten
   return isGlobalIgnores(base) ? extended : [...extended, base]
 }
 
-function extendConfig(base: ExtendsItem, extension: ExtendsItem, name: string): ExtendsItem {
+function extendConfig(
+  base: ExpandedConfigItem,
+  extension: ExtendsItem,
+  name: string
+): ExpandedConfigItem {
   if ('extends' in extension) {
     throw new TypeError(`Nested 'extends' is not allowed in "${name}".`)
   }
+  if ('basePath' in extension) {
+    throw new TypeError(
+      `'basePath' is not allowed in "${name}", it takes the one of the config extending it.`
+    )
+  }
 
+  return {
+    ...inheritPatterns(base, extension),
+    name,
+    ...(base.basePath !== undefined && { basePath: base.basePath })
+  }
+}
+
+function inheritPatterns(base: ExpandedConfigItem, extension: ExtendsItem): ExtendsItem {
   // Global ignores apply everywhere, so they don't inherit `files` or `ignores`.
   if (isGlobalIgnores(extension)) {
-    return { ...extension, name }
+    return extension
   }
 
   return {
     ...extension,
-    name,
     ...('files' in base && { files: extendFiles(base.files, extension) }),
     ...('ignores' in base &&
       base.ignores && { ignores: [...base.ignores, ...getIgnores(extension)] })
