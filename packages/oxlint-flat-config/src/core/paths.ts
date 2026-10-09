@@ -16,6 +16,7 @@ export type OxlintPathItem =
 type MatchedItem = Omit<GlobalConfigItem, 'extends' | 'basePath'> &
   Pick<ScopedConfigItem, 'ignores'>
 
+// TODO: test through `defineConfig` once it returns a config
 /**
  * Rewrites ESLint-style `files`, `ignores` and `basePath` into Oxlint-style patterns relative to the config file's directory.
  *
