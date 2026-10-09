@@ -16,6 +16,7 @@ export type ExpandedConfigItem =
 
 type Files = ScopedConfigItem['files']
 
+// TODO: test through `defineConfig` once it returns a config
 // Ported from ESLint's `@eslint/config-helpers`:
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/define-config.js#L376-L469
 /**
