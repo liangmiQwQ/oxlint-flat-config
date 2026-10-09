@@ -3,7 +3,6 @@ import type { ExpandedConfigItem } from './extends.ts'
 import { flatTraverse } from './flat-traverse.ts'
 import type { ConfigInput } from './types.ts'
 
-// TODO: test through `defineConfig`
 /**
  * Flattens nested config arrays, skips falsy values and expands `extends`, same as ESLint's `defineConfig`.
  */
