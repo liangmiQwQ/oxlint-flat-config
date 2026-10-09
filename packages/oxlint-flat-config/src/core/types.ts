@@ -35,6 +35,7 @@ export interface ScopedConfigItem extends BaseConfigItem, ExtendableConfigItem {
 /** Ignore files globally. Create with `globalIgnores` and `includeIgnoreFile`. */
 export interface GlobalIgnoresItem {
   name?: string
+  /** The directory `ignores` is relative to, resolved from the config file's directory. */
   basePath?: string
   ignores: string[]
 }
@@ -46,10 +47,11 @@ export type ConfigInput = FlatConfigItem | ConfigInput[] | false | null | undefi
 export type ExtendsInput = ExtendsItem | ExtendsInput[]
 
 // Same as ESLint: an extended config can't have `extends` itself, so the expansion stays one level deep.
+// It can't have `basePath` either, because it takes the one of the config extending it.
 export type ExtendsItem =
-  | Omit<GlobalConfigItem, 'extends'>
-  | Omit<ScopedConfigItem, 'extends'>
-  | GlobalIgnoresItem
+  | Omit<GlobalConfigItem, 'extends' | 'basePath'>
+  | Omit<ScopedConfigItem, 'extends' | 'basePath'>
+  | Omit<GlobalIgnoresItem, 'basePath'>
 
 interface ExtendableConfigItem {
   /**
@@ -62,6 +64,8 @@ interface ExtendableConfigItem {
 interface BaseConfigItem {
   /** A label for this config object, used in error messages and config inspection. */
   name?: string
+  /** The directory `files` and `ignores` are relative to, resolved from the config file's directory. */
+  basePath?: string
   /** Built-in Rust plugins to enable. Overwrites oxlint's default plugin set. */
   plugins?: OxlintConfig['plugins']
   /** ESLint-compatible JS plugins. */

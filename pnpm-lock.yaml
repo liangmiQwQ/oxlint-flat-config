@@ -179,6 +179,9 @@ catalogs:
     get-oxlint-rules:
       specifier: ^0.1.1
       version: 0.1.1
+    glob-distribute:
+      specifier: ^0.1.0
+      version: 0.1.0
     oxlint:
       specifier: ^1.85.0
       version: 1.85.0
@@ -226,6 +229,9 @@ importers:
       get-oxlint-rules:
         specifier: 'catalog:'
         version: 0.1.1
+      glob-distribute:
+        specifier: 'catalog:'
+        version: 0.1.0
     devDependencies:
       oxlint:
         specifier: 'catalog:'
@@ -1145,6 +1151,9 @@ packages:
   get-oxlint-rules@0.1.1:
     resolution: {integrity: sha512-oCgcTcfSatpHnCZth8MTlwX7TXKtb0y9gDBC8g9Ari6g4GnzxcbKCZt1LO8dwIBJvf4aGZGuIgGU2dSG71UtAA==}
 
+  glob-distribute@0.1.0:
+    resolution: {integrity: sha512-Z+EYFkNVV8e7BeciaFg5j6PyzyOsTQscXOH1SKmtGavMaRWjmW4U9n6+cN08VlRgyolYM1SD0gUsWL/pkQgJ+Q==}
+
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
@@ -2036,6 +2045,8 @@ snapshots:
     dependencies:
       find-cache-dir: 6.0.0
       tinyexec: 1.3.1
+
+  glob-distribute@0.1.0: {}
 
   jiti@2.7.0: {}
 
