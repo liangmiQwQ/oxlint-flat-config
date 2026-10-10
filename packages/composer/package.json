@@ -1,5 +1,5 @@
 {
-  "name": "@oxlint-flat-config/utils",
+  "name": "@oxlint-flat-config/composer",
   "version": "0.0.0",
   "description": "Utilities for composing Oxlint flat configs.",
   "homepage": "https://github.com/liangmiQwQ/oxlint-flat-config#readme",
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liangmiQwQ/oxlint-flat-config.git",
-    "directory": "packages/utils"
+    "directory": "packages/composer"
   },
   "files": [
     "dist"
@@ -28,6 +28,16 @@
     "build": "vp run cpack",
     "check": "vp run ccheck",
     "dev": "vp pack --watch",
-    "prepublishOnly": "vp run build"
+    "prepublishOnly": "vp run build",
+    "test": "vp run ctest"
+  },
+  "dependencies": {
+    "oxlint-flat-config": "workspace:^"
+  },
+  "devDependencies": {
+    "oxlint": "catalog:"
+  },
+  "peerDependencies": {
+    "oxlint": ">=1.85.0"
   }
 }
