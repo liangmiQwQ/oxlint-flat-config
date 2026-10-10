@@ -10,9 +10,12 @@ export interface CategoryOptions {
 }
 
 export interface ScopedCategoryOptions extends CategoryOptions {
-  files: ScopedConfigItem['files']
+  files: NonNullable<ScopedConfigItem['files']>
   ignores?: string[]
 }
+
+// Category presets only contain rules and metadata, so they can also be used in extends.
+type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'rules'>
 
 // Shared by every `category()` call, so Oxlint runs at most once per process.
 let rulesPromise: Promise<OxlintRule[]> | undefined
@@ -25,11 +28,11 @@ let rulesPromise: Promise<OxlintRule[]> | undefined
 export async function category(
   categories: RuleCategories,
   options: ScopedCategoryOptions
-): Promise<ScopedConfigItem>
+): Promise<CategoryConfig & ScopedCategoryOptions>
 export async function category(
   categories: RuleCategories,
   options?: CategoryOptions
-): Promise<GlobalConfigItem>
+): Promise<CategoryConfig>
 export async function category(
   categories: RuleCategories,
   options: CategoryOptions | ScopedCategoryOptions = {}

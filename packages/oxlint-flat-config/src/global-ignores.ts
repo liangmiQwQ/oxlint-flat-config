@@ -5,7 +5,10 @@ let globalIgnoreCount = 0
 
 // Ported from ESLint's `@eslint/config-helpers`:
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/global-ignores.js#L29-L44
-export function globalIgnores(ignorePatterns: string[], name?: string): GlobalIgnoresItem {
+export function globalIgnores(
+  ignorePatterns: string[],
+  name?: string
+): Omit<GlobalIgnoresItem, 'basePath'> {
   if (ignorePatterns.length === 0) {
     throw new TypeError('ignorePatterns must contain at least one pattern')
   }

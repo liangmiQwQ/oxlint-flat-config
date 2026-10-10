@@ -10,63 +10,61 @@ import type {
 /**
  * One ESLint-style flat config object.
  *
- * How it maps onto `OxlintConfig`:
- * - only `ignores` (plus optional `name`): a global ignore, goes into `ignorePatterns`
- * - no `files`: `categories`, `settings` and `options` are merged into the root config, the rest becomes an `overrides` entry for every file
- * - with `files`: becomes an `overrides` entry, where `ignores` becomes `excludeFiles`
+ * Ignores-only objects become global ignore patterns. Other objects become overrides,
+ * with root-only fields merged into the root config when no scope is set.
  */
-export type FlatConfigItem = GlobalIgnoresItem | GlobalConfigItem | ScopedConfigItem
+export type FlatConfigItem = ConfigFields & ScopeConstraint
 
-/** Applies to every file. The only item kind that may carry oxlint's root-only fields. */
-export interface GlobalConfigItem extends BaseConfigItem, ExtendableConfigItem {
-  categories?: RuleCategories
-  settings?: OxlintConfig['settings']
-  options?: OxlintConfig['options']
-}
+// Scope and root-only fields cannot coexist. Explicit never fields also reject combinations passed through variables.
+type ScopeConstraint =
+  | Forbidden<'files' | 'basePath'>
+  | Forbidden<'categories' | 'settings' | 'options'>
 
-/** Applies only to `files`. */
-export interface ScopedConfigItem extends BaseConfigItem, ExtendableConfigItem {
-  /** Glob patterns this config applies to. */
-  files: (string | string[])[]
-  /** Glob patterns excluded from this config. They are not ignored globally. */
-  ignores?: string[]
-}
+/** Applies to every file and accepts Oxlint's root-only fields. */
+export type GlobalConfigItem = ConfigFields & Forbidden<'files' | 'basePath'>
 
-/** Ignore files globally. Create with `globalIgnores` and `includeIgnoreFile`. */
-export interface GlobalIgnoresItem {
-  name?: string
-  /** The directory `ignores` is relative to, resolved from the config file's directory. */
-  basePath?: string
-  ignores: string[]
-}
+/** Requires files or a base directory; without files, matches every file inside basePath. */
+export type ScopedConfigItem = ConfigFields &
+  Forbidden<'categories' | 'settings' | 'options'> &
+  (Required<Pick<ConfigFields, 'files'>> | Required<Pick<ConfigFields, 'basePath'>>)
+
+/** Only ignore patterns and their metadata; adding rules makes an ordinary config instead. */
+export type GlobalIgnoresItem = Pick<ConfigFields, 'name' | 'basePath'> &
+  Required<Pick<ConfigFields, 'ignores'>> &
+  Forbidden<Exclude<keyof ConfigFields, 'name' | 'basePath' | 'ignores'>>
 
 // Same as `@eslint/config-helpers`: nested arrays and falsy values let users spread presets and write `cond && config`.
 export type ConfigInput = FlatConfigItem | ConfigInput[] | false | null | undefined
 
-/** One entry of `extends`. Nested arrays let users pass a whole preset array as a single entry. */
+/** One entry of extends. Nested arrays let users pass a whole preset array as a single entry. */
 export type ExtendsInput = ExtendsItem | ExtendsInput[]
 
-// Same as ESLint: an extended config can't have `extends` itself, so the expansion stays one level deep.
-// It can't have `basePath` either, because it takes the one of the config extending it.
-export type ExtendsItem =
-  | Omit<GlobalConfigItem, 'extends' | 'basePath'>
-  | Omit<ScopedConfigItem, 'extends' | 'basePath'>
-  | Omit<GlobalIgnoresItem, 'basePath'>
+// Extensions follow the same scope constraint, but inherit basePath and cannot extend again.
+export type ExtendsItem = Omit<ConfigFields, 'extends' | 'basePath'> &
+  ScopeConstraint &
+  Forbidden<'extends' | 'basePath'>
 
-interface ExtendableConfigItem {
-  /**
-   * Configs this item builds on. Each one is expanded to its own item placed before this one, inheriting this item's `files` and `ignores`.
-   */
-  extends?: ExtendsInput[]
-}
+type Forbidden<Key extends keyof ConfigFields> = Partial<Record<Key, never>>
 
-/** Fields allowed on every config item. */
-interface BaseConfigItem {
+/** Config fields before validating scope or expanding extends. */
+export interface ConfigFields {
   /** A label for this config object, used in error messages and config inspection. */
   name?: string
-  /** The directory `files` and `ignores` are relative to, resolved from the config file's directory. */
+  /** Glob patterns this config applies to. */
+  files?: (string | string[])[]
+  /** Glob patterns excluded from this config, or ignored globally in an ignores-only item. */
+  ignores?: string[]
+  /** The directory files and ignores are relative to, resolved from the config file's directory. */
   basePath?: string
-  /** Built-in Rust plugins to enable. Overwrites oxlint's default plugin set. */
+  /** Configs placed before this one, inheriting its file patterns, ignores and base directory. */
+  extends?: ExtendsInput[]
+
+  // Oxlint only reads these fields in the root config, not in overrides.
+  categories?: RuleCategories
+  settings?: OxlintConfig['settings']
+  options?: OxlintConfig['options']
+
+  /** Built-in Rust plugins to enable. Overwrites Oxlint's default plugin set. */
   plugins?: OxlintConfig['plugins']
   /** ESLint-compatible JS plugins. */
   jsPlugins?: ExternalPluginEntry[]
