@@ -20,11 +20,11 @@ const DEFAULT_NAME = 'Imported .gitignore patterns'
 export function includeIgnoreFile(
   ignoreFilePath: string,
   options?: IncludeIgnoreFileOptions | string
-): GlobalIgnoresItem
+): Omit<GlobalIgnoresItem, 'basePath'>
 export function includeIgnoreFile(
   ignoreFilePaths: string[],
   options?: IncludeIgnoreFileOptions | string
-): GlobalIgnoresItem[]
+): Omit<GlobalIgnoresItem, 'basePath'>[]
 export function includeIgnoreFile(
   ignoreFilePathArg: string | string[],
   options?: IncludeIgnoreFileOptions | string

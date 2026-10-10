@@ -1,20 +1,11 @@
 import { flatTraverse } from './flat-traverse.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
-import type {
-  ExtendsItem,
-  FlatConfigItem,
-  GlobalConfigItem,
-  GlobalIgnoresItem,
-  ScopedConfigItem
-} from './types.ts'
+import type { ConfigFields, ExtendsItem, FlatConfigItem } from './types.ts'
 
-/** A config item with its `extends` expanded. Unlike `ExtendsItem`, it keeps `basePath`. */
-export type ExpandedConfigItem =
-  | Omit<GlobalConfigItem, 'extends'>
-  | Omit<ScopedConfigItem, 'extends'>
-  | GlobalIgnoresItem
+// Inherited scope can invalidate a previously valid config. Keep the intermediate fields intact so buildOxlintConfig can report it.
+export type ExpandedConfigItem = Omit<ConfigFields, 'extends'>
 
-type Files = ScopedConfigItem['files']
+type Files = NonNullable<ConfigFields['files']>
 
 // Ported from ESLint's `@eslint/config-helpers`:
 // https://github.com/eslint/rewrite/blob/a413d74c64d3bcc3ce56b831b5c044c3f9ae4b08/packages/config-helpers/src/define-config.js#L376-L469
@@ -56,7 +47,7 @@ function extendConfig(
   }
 }
 
-function inheritPatterns(base: ExpandedConfigItem, extension: ExtendsItem): ExtendsItem {
+function inheritPatterns(base: ExpandedConfigItem, extension: ExtendsItem): ExpandedConfigItem {
   // Global ignores apply everywhere, so they don't inherit `files` or `ignores`.
   if (isGlobalIgnores(extension)) {
     return extension
@@ -64,7 +55,7 @@ function inheritPatterns(base: ExpandedConfigItem, extension: ExtendsItem): Exte
 
   return {
     ...extension,
-    ...('files' in base && { files: extendFiles(base.files, extension) }),
+    ...(base.files !== undefined && { files: extendFiles(base.files, extension) }),
     ...('ignores' in base &&
       base.ignores && { ignores: [...base.ignores, ...getIgnores(extension)] })
   }
@@ -75,7 +66,7 @@ function getIgnores(item: ExtendsItem): string[] {
 }
 
 function extendFiles(baseFiles: Files, extension: ExtendsItem): Files {
-  const extensionFiles = 'files' in extension ? extension.files : []
+  const extensionFiles = extension.files ?? []
 
   // Same as ESLint, an empty side doesn't narrow the other one.
   if (extensionFiles.length === 0) {

@@ -52,6 +52,7 @@ it('merges root-only fields of unscoped configs, a later one winning key by key'
 
 it('rejects root-only fields in a scoped config', () => {
   expect(() =>
+    // @ts-expect-error -- root-only fields cannot be scoped
     defineConfig({ name: 'scoped', files: ['src/**'], categories: { correctness: 'error' } })
   ).toThrow(`'categories' is not allowed in "scoped" with 'files' or 'basePath'`)
 })
@@ -185,4 +186,24 @@ it('rejects `extends` and `basePath` in an extended config', () => {
     // @ts-expect-error -- extended configs can't have `basePath`
     defineConfig({ name: 'base', extends: [{ name: 'preset', basePath: 'a' }] })
   ).toThrow(`'basePath' is not allowed in "base > preset"`)
+})
+
+it('inherits scope when files is explicitly undefined', () => {
+  expect(
+    defineConfig({
+      basePath: 'packages/a',
+      files: undefined,
+      extends: [{ files: undefined, rules: { 'no-console': 'error' } }]
+    })
+  ).toEqual({
+    overrides: [{ files: ['packages/a/**'], excludeFiles: [], rules: { 'no-console': 'error' } }]
+  })
+  expect(
+    defineConfig({
+      files: ['src/**'],
+      extends: [{ files: undefined, rules: { 'no-console': 'error' } }]
+    })
+  ).toEqual({
+    overrides: [{ files: ['src/**'], excludeFiles: [], rules: { 'no-console': 'error' } }]
+  })
 })
