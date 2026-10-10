@@ -21,7 +21,7 @@ type ScopeConstraint =
   | Forbidden<'categories' | 'settings' | 'options'>
 
 /** Applies to every file and accepts Oxlint's root-only fields. */
-export type GlobalConfigItem = ConfigFields & Forbidden<'files' | 'basePath'>
+export type GlobalConfigItem = ConfigFields & Forbidden<'files' | 'basePath' | 'ignores'>
 
 /** Requires files or a base directory; without files, matches every file inside basePath. */
 export type ScopedConfigItem = ConfigFields &

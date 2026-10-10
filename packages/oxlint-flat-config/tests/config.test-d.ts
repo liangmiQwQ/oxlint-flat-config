@@ -12,7 +12,7 @@ it('accepts configs, nested arrays and falsy entries', () => {
   const configs = [
     {},
     { rules: { 'no-console': 'warn' }, ignores: ['generated/**'] },
-    { categories: { correctness: 'error' }, ignores: ['generated/**'] },
+    { categories: { correctness: 'error' } },
     { files: ['src/**'], rules: { 'no-console': 'error' } },
     { basePath: 'packages/a', rules: { 'no-console': 'error' } },
     { files: ['*.ts'], basePath: 'packages/a' },
@@ -21,7 +21,7 @@ it('accepts configs, nested arrays and falsy entries', () => {
   defineConfig(configs, [false, null, undefined, [configs]])
 })
 
-it('rejects root-only fields with either kind of scope', () => {
+it('rejects root-only fields with scope or ignores', () => {
   const scopedCategories = { files: ['src/**'], categories: { correctness: 'error' as const } }
   // @ts-expect-error -- categories cannot be scoped by files
   defineConfig(scopedCategories)
@@ -36,6 +36,8 @@ it('rejects root-only fields with either kind of scope', () => {
   void ({ files: ['src/**'], ignores: ['dist'], options: {} } satisfies FlatConfigItem)
   // @ts-expect-error -- options cannot be scoped by basePath
   void ({ basePath: 'src', options: {} } satisfies FlatConfigItem)
+  // @ts-expect-error -- ignores cannot limit root-only categories
+  defineConfig({ categories: { correctness: 'error' }, ignores: ['generated/**'] })
 })
 
 it('checks the named config kinds', () => {
