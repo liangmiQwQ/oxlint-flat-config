@@ -17,7 +17,7 @@ export type FlatConfigItem = ConfigFields & ScopeConstraint
 
 // Scope and root-only fields cannot coexist. Explicit never fields also reject combinations passed through variables.
 type ScopeConstraint =
-  | Forbidden<'files' | 'basePath'>
+  | Forbidden<'files' | 'basePath' | 'ignores'>
   | Forbidden<'categories' | 'settings' | 'options'>
 
 /** Applies to every file and accepts Oxlint's root-only fields. */
