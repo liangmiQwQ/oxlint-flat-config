@@ -85,7 +85,8 @@ jobs:
     concurrency:
       group: pack-${{ github.ref }}
       cancel-in-progress: false
-    permissions: {}
+    permissions:
+      contents: read
     outputs:
       files: ${{ steps.pack.outputs.files }}
     steps:
