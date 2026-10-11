@@ -17,14 +17,14 @@ pnpm add -D oxlint oxlint-flat-config
 Create an `oxlint.config.ts` and export the result of `defineConfig`:
 
 ```ts
-import { defineConfig, globalIgnores } from 'oxlint-flat-config'
+import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
+  await category({ correctness: 'error' }),
   {
     name: 'base',
     plugins: ['typescript', 'unicorn'],
-    categories: { correctness: 'error' },
     rules: { 'no-console': 'warn' }
   },
   {

@@ -2,6 +2,7 @@ import { getRules } from 'get-oxlint-rules'
 import type { OxlintRule } from 'get-oxlint-rules'
 import type { DummyRuleMap, RuleCategories } from 'oxlint'
 
+import { markCategories } from './core/category.ts'
 import type { GlobalConfigItem, ScopedConfigItem } from './core/types.ts'
 
 export interface CategoryOptions {
@@ -23,7 +24,8 @@ let rulesPromise: Promise<OxlintRule[]> | undefined
 /**
  * Turns Oxlint categories into a flat config object with an explicit rule for every rule in them.
  *
- * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
+ * The result follows flat config order: later config objects override it, and it overrides earlier ones.
+ * When nothing before it sets rules, `defineConfig` writes it as Oxlint's root `categories` instead.
  */
 export async function category(
   categories: RuleCategories,
@@ -37,12 +39,13 @@ export async function category(
   categories: RuleCategories,
   options: CategoryOptions | ScopedCategoryOptions = {}
 ): Promise<GlobalConfigItem | ScopedConfigItem> {
-  const rules = await loadRules()
+  const rules = toRuleMap(await loadRules(), categories)
+  markCategories(rules, categories)
 
   return {
     ...options,
     name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
-    rules: toRuleMap(rules, categories)
+    rules
   }
 }
 

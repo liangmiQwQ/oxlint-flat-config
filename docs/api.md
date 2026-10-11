@@ -76,6 +76,8 @@ Turns Oxlint rule categories into a config object that sets every rule in them e
 
 Oxlint's own `categories` field applies before every rule, wherever you set it. A `category()` object follows the array order instead: later objects override it, and it overrides earlier ones.
 
+When a global `category()` object has no rules before it, `defineConfig` writes it as Oxlint's root `categories` to keep the generated config small. A scoped one, one after other rules, or one whose rules were changed stays as explicit rules.
+
 ```ts
 import { category, defineConfig } from 'oxlint-flat-config'
 import preset from 'some-preset'

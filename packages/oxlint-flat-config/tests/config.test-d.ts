@@ -12,7 +12,7 @@ it('accepts configs, nested arrays and falsy entries', () => {
   const configs = [
     {},
     { rules: { 'no-console': 'warn' }, ignores: ['generated/**'] },
-    { categories: { correctness: 'error' } },
+    { settings: {}, options: {} },
     { files: ['src/**'], rules: { 'no-console': 'error' } },
     { basePath: 'packages/a', rules: { 'no-console': 'error' } },
     { files: ['*.ts'], basePath: 'packages/a' },
@@ -22,11 +22,9 @@ it('accepts configs, nested arrays and falsy entries', () => {
 })
 
 it('rejects root-only fields with scope or ignores', () => {
-  const scopedCategories = { files: ['src/**'], categories: { correctness: 'error' as const } }
-  // @ts-expect-error -- categories cannot be scoped by files
-  defineConfig(scopedCategories)
-  // @ts-expect-error -- categories cannot be scoped by basePath
-  void ({ basePath: 'src', categories: { correctness: 'error' } } satisfies FlatConfigItem)
+  const scopedOptions = { files: ['src/**'], options: {} }
+  // @ts-expect-error -- options cannot be scoped by files
+  defineConfig(scopedOptions)
   // @ts-expect-error -- settings cannot be scoped by files
   void ({ files: ['src/**'], settings: {} } satisfies FlatConfigItem)
   const scopedSettings = { basePath: 'src', ignores: ['dist'], settings: {} }
@@ -36,8 +34,8 @@ it('rejects root-only fields with scope or ignores', () => {
   void ({ files: ['src/**'], ignores: ['dist'], options: {} } satisfies FlatConfigItem)
   // @ts-expect-error -- options cannot be scoped by basePath
   void ({ basePath: 'src', options: {} } satisfies FlatConfigItem)
-  // @ts-expect-error -- ignores cannot limit root-only categories
-  defineConfig({ categories: { correctness: 'error' }, ignores: ['generated/**'] })
+  // @ts-expect-error -- ignores cannot limit root-only settings
+  defineConfig({ settings: {}, ignores: ['generated/**'] })
 })
 
 it('checks the named config kinds', () => {
@@ -49,10 +47,10 @@ it('checks the named config kinds', () => {
 })
 
 it('checks extensions through variables and nested arrays', () => {
-  const scopedCategories = { files: ['src/**'], categories: { correctness: 'error' as const } }
-  defineConfig({ extends: [[{ categories: { correctness: 'error' } }]] })
+  const scopedSettings = { files: ['src/**'], settings: {} }
+  defineConfig({ extends: [[{ settings: {} }]] })
   // @ts-expect-error -- a nested preset cannot hide an invalid combination
-  defineConfig({ extends: [[scopedCategories]] })
+  defineConfig({ extends: [[scopedSettings]] })
   // @ts-expect-error -- settings cannot be scoped inside an extension
   void ({ files: ['src/**'], settings: {} } satisfies ExtendsItem)
   // @ts-expect-error -- options cannot be scoped inside an extension

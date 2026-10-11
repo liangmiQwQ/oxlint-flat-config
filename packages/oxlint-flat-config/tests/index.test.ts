@@ -10,10 +10,9 @@ it('keeps a later unscoped rule after an earlier scoped one', () => {
   expect(
     defineConfig(
       { files: ['src/**'], rules: { 'no-console': 'error' } },
-      { categories: { correctness: 'error' }, rules: { 'no-console': 'off' } }
+      { rules: { 'no-console': 'off' } }
     )
   ).toEqual({
-    categories: { correctness: 'error' },
     overrides: [
       { files: ['src/**'], excludeFiles: [], rules: { 'no-console': 'error' } },
       { files: ['**/*'], excludeFiles: [], rules: { 'no-console': 'off' } }
@@ -38,14 +37,12 @@ it('merges root-only fields of unscoped configs, a later one winning key by key'
   expect(
     defineConfig(
       {
-        categories: { correctness: 'error', perf: 'warn' },
         settings: { react: { version: '18' } }
       },
-      { categories: { perf: 'off' }, options: { typeAware: true } }
+      { settings: { react: { version: '19' } }, options: { typeAware: true } }
     )
   ).toEqual({
-    categories: { correctness: 'error', perf: 'off' },
-    settings: { react: { version: '18' } },
+    settings: { react: { version: '19' } },
     options: { typeAware: true }
   })
 })
@@ -53,8 +50,8 @@ it('merges root-only fields of unscoped configs, a later one winning key by key'
 it('rejects root-only fields in a scoped config', () => {
   expect(() =>
     // @ts-expect-error -- root-only fields cannot be scoped
-    defineConfig({ name: 'scoped', files: ['src/**'], categories: { correctness: 'error' } })
-  ).toThrow(`'categories' is not allowed in "scoped" with 'files' or 'basePath'`)
+    defineConfig({ name: 'scoped', files: ['src/**'], settings: {} })
+  ).toThrow(`'settings' is not allowed in "scoped" with 'files' or 'basePath'`)
 })
 
 it('turns global ignores into root-anchored `ignorePatterns`', () => {

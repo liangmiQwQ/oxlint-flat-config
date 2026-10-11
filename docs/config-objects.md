@@ -2,49 +2,50 @@
 
 Every object in the array passed to `defineConfig` is one of three kinds. The kind decides where it ends up in the generated Oxlint config.
 
-| Kind           | How to recognize it                    | Becomes                                                                                       |
-| -------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Global ignores | Only has `ignores`, `name`, `basePath` | Entries in `ignorePatterns`                                                                   |
-| Global config  | Has neither `files` nor `basePath`     | `categories`, `settings` and `options` in the root, everything else in an override for `**/*` |
-| Scoped config  | Has `files`, `basePath` or both        | An entry in `overrides`                                                                       |
+| Kind           | How to recognize it                    | Becomes                                                                         |
+| -------------- | -------------------------------------- | ------------------------------------------------------------------------------- |
+| Global ignores | Only has `ignores`, `name`, `basePath` | Entries in `ignorePatterns`                                                     |
+| Global config  | Has neither `files` nor `basePath`     | `settings` and `options` in the root, everything else in an override for `**/*` |
+| Scoped config  | Has `files`, `basePath` or both        | An entry in `overrides`                                                         |
 
 Oxlint applies every override after the root config. That is why rules from a global config also go into an override instead of the root: it keeps them in the same order as the array.
 
 ## Fields
 
-| Field        | Description                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| `name`       | A label used in error messages and by the [composer](./composer.md) to find the object.       |
-| `files`      | Glob patterns the object applies to.                                                          |
-| `ignores`    | Glob patterns excluded from the object, or ignored everywhere in a global ignores object.     |
-| `basePath`   | The directory `files` and `ignores` are relative to, relative to the config file's directory. |
-| `extends`    | Configs placed before this one. See [Extends](#extends).                                      |
-| `categories` | Oxlint rule categories. Global config only.                                                   |
-| `settings`   | Plugin settings. Global config only.                                                          |
-| `options`    | Oxlint options such as `typeAware`. Global config only.                                       |
-| `plugins`    | Built-in plugins to enable. Overwrites Oxlint's default plugin set.                           |
-| `jsPlugins`  | ESLint-compatible JS plugins.                                                                 |
-| `rules`      | Rule settings.                                                                                |
-| `env`        | Environments, such as `browser` or `node`.                                                    |
-| `globals`    | Global variables.                                                                             |
+| Field       | Description                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| `name`      | A label used in error messages and by the [composer](./composer.md) to find the object.       |
+| `files`     | Glob patterns the object applies to.                                                          |
+| `ignores`   | Glob patterns excluded from the object, or ignored everywhere in a global ignores object.     |
+| `basePath`  | The directory `files` and `ignores` are relative to, relative to the config file's directory. |
+| `extends`   | Configs placed before this one. See [Extends](#extends).                                      |
+| `settings`  | Plugin settings. Global config only.                                                          |
+| `options`   | Oxlint options such as `typeAware`. Global config only.                                       |
+| `plugins`   | Built-in plugins to enable. Overwrites Oxlint's default plugin set.                           |
+| `jsPlugins` | ESLint-compatible JS plugins.                                                                 |
+| `rules`     | Rule settings.                                                                                |
+| `env`       | Environments, such as `browser` or `node`.                                                    |
+| `globals`   | Global variables.                                                                             |
 
-Oxlint only reads `categories`, `settings` and `options` in the root config, so a scoped config can't use them. TypeScript reports this, and `defineConfig` throws if it slips through.
+Oxlint only reads `settings` and `options` in the root config, so a scoped config can't use them. TypeScript reports this, and `defineConfig` throws if it slips through.
 
-When several global configs set `categories`, `settings` or `options`, they are merged key by key and the later one wins.
+When several global configs set `settings` or `options`, they are merged key by key and the later one wins.
+
+There is no `categories` field. Use [`category()`](./api.md#category) instead.
 
 ## Example
 
 This config:
 
 ```ts
-import { defineConfig, globalIgnores } from 'oxlint-flat-config'
+import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
+  await category({ correctness: 'error' }),
   {
     name: 'base',
     plugins: ['typescript', 'unicorn'],
-    categories: { correctness: 'error' },
     rules: { 'no-console': 'warn' }
   },
   {

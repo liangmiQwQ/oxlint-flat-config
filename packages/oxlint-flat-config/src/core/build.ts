@@ -1,16 +1,17 @@
-import type { OxlintConfig, OxlintOverride } from 'oxlint'
+import type { OxlintConfig, OxlintOverride, RuleCategories } from 'oxlint'
 
+import { getCategories } from './category.ts'
 import type { ExpandedConfigItem } from './extends.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
 import { toIgnorePatterns, toOverridePaths } from './paths.ts'
 import type { GlobalIgnoresItem } from './types.ts'
 
 type ConfigItem = Exclude<ExpandedConfigItem, GlobalIgnoresItem>
-type RootFields = Pick<OxlintConfig, 'categories' | 'settings' | 'options'>
+type RootFields = Pick<OxlintConfig, 'settings' | 'options'>
 type OverrideFields = Omit<OxlintOverride, 'files' | 'excludeFiles'>
 
 // Oxlint only reads these fields in the root config, not in `overrides`.
-const ROOT_ONLY_KEYS = new Set(['categories', 'settings', 'options'])
+const ROOT_ONLY_KEYS = new Set(['settings', 'options'])
 
 /** Builds an Oxlint config from flat config items, following their order. */
 export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {
@@ -29,15 +30,28 @@ function addItem(config: OxlintConfig, item: ExpandedConfigItem): OxlintConfig {
     }
   }
 
-  return addOverrides(mergeIntoRoot(config, item), item)
+  const root = mergeIntoRoot(config, item)
+  const categories = toRootCategories(config, item)
+  if (categories) {
+    const { rules: _, ...rest } = item
+    return addOverrides({ ...root, categories: mergeRecords(root.categories, categories) }, rest)
+  }
+  return addOverrides(root, item)
+}
+
+// Oxlint applies root categories before every override, so only a global `category()` preset with no rules before it can move there.
+function toRootCategories(config: OxlintConfig, item: ConfigItem): RuleCategories | undefined {
+  const scoped =
+    item.files !== undefined || item.basePath !== undefined || item.ignores !== undefined
+  const hasRules = config.overrides?.some(override => override.rules !== undefined)
+  return scoped || hasRules ? undefined : getCategories(item.rules)
 }
 
 // Same as ESLint, a later item wins key by key.
 function mergeIntoRoot(config: OxlintConfig, item: ConfigItem): OxlintConfig {
-  const { categories, settings, options } = toRootFields(item)
+  const { settings, options } = toRootFields(item)
   return withoutUndefined({
     ...config,
-    categories: mergeRecords(config.categories, categories),
     settings: mergeRecords(config.settings, settings),
     options: mergeRecords(config.options, options)
   })
@@ -58,8 +72,8 @@ function addOverrides(config: OxlintConfig, item: ConfigItem): OxlintConfig {
 function toRootFields(item: ConfigItem): RootFields {
   // A config without `files` applies to every file in its `basePath`, which is every file when `basePath` is unset.
   if (!('files' in item) && item.basePath === undefined) {
-    const { categories, settings, options } = item
-    return { categories, settings, options }
+    const { settings, options } = item
+    return { settings, options }
   }
 
   const rootOnlyKey = Object.keys(item).find(key => ROOT_ONLY_KEYS.has(key))

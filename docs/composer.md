@@ -59,7 +59,7 @@ Changes the named object. `patch` is either an object or a function.
 An object is merged into the existing one:
 
 - Arrays (`files`, `ignores`, `extends`, `plugins`, `jsPlugins`) are concatenated.
-- Records (`rules`, `categories`, `settings`, `options`, `env`, `globals`) are merged key by key, the patch winning.
+- Records (`rules`, `settings`, `options`, `env`, `globals`) are merged key by key, the patch winning.
 - Other fields, such as `name` and `basePath`, are replaced.
 
 A function receives the existing object and returns the new one, which can be async:

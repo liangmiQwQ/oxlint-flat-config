@@ -3,8 +3,7 @@ import type {
   ExternalPluginEntry,
   OxlintConfig,
   OxlintEnv,
-  OxlintGlobals,
-  RuleCategories
+  OxlintGlobals
 } from 'oxlint'
 
 /**
@@ -18,14 +17,14 @@ export type FlatConfigItem = ConfigFields & ScopeConstraint
 // Scope and root-only fields cannot coexist. Explicit never fields also reject combinations passed through variables.
 type ScopeConstraint =
   | Forbidden<'files' | 'basePath' | 'ignores'>
-  | Forbidden<'categories' | 'settings' | 'options'>
+  | Forbidden<'settings' | 'options'>
 
 /** Applies to every file and accepts Oxlint's root-only fields. */
 export type GlobalConfigItem = ConfigFields & Forbidden<'files' | 'basePath' | 'ignores'>
 
 /** Requires files or a base directory; without files, matches every file inside basePath. */
 export type ScopedConfigItem = ConfigFields &
-  Forbidden<'categories' | 'settings' | 'options'> &
+  Forbidden<'settings' | 'options'> &
   (Required<Pick<ConfigFields, 'files'>> | Required<Pick<ConfigFields, 'basePath'>>)
 
 /** Only ignore patterns and their metadata; adding rules makes an ordinary config instead. */
@@ -60,7 +59,6 @@ export interface ConfigFields {
   extends?: ExtendsInput[]
 
   // Oxlint only reads these fields in the root config, not in overrides.
-  categories?: RuleCategories
   settings?: OxlintConfig['settings']
   options?: OxlintConfig['options']
 
