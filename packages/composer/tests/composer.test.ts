@@ -6,7 +6,7 @@ import { composer } from '../src/index.ts'
 
 it('resolves to the same config as defineConfig', async () => {
   const configs: ConfigInput[] = [
-    { categories: { correctness: 'error' } },
+    { rules: { 'no-debugger': 'error' } },
     { files: ['src/**'], rules: { 'no-console': 'error' } }
   ]
 

@@ -4,7 +4,7 @@
 
 ## Root-Only Fields
 
-Oxlint only reads `categories`, `settings` and `options` in the root config. A config object with `files` or `basePath` can't set them. In ESLint, `settings` and `languageOptions` can be scoped to files.
+Oxlint only reads `settings` and `options` in the root config. A config object with `files` or `basePath` can't set them. In ESLint, `settings` and `languageOptions` can be scoped to files.
 
 ## Negated `ignores`
 
@@ -42,7 +42,7 @@ An extended config can't have its own `extends` or `basePath`. It always uses th
 
 ## Categories
 
-Oxlint's `categories` field is not part of ESLint, and Oxlint applies it before every rule, wherever it is set. If you want categories to follow the array order like other config objects, use [`category()`](./api.md#category).
+Oxlint's `categories` field is not part of ESLint, and Oxlint applies it before every rule, wherever it is set. Config objects don't accept it. Use [`category()`](./api.md#category) instead, which follows the array order like other config objects.
 
 ## Ignore Files
 
