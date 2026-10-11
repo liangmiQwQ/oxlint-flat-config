@@ -17,11 +17,11 @@ pnpm add -D oxlint oxlint-flat-config
 Create an `oxlint.config.ts` and export the result of `defineConfig`:
 
 ```ts
-import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
+import { defineConfig, globalIgnores, recommended } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
-  await category({ correctness: 'error', plugins: ['eslint', 'unicorn'] }),
+  recommended,
   {
     name: 'base',
     rules: { 'no-console': 'warn' }
@@ -36,7 +36,7 @@ export default defineConfig(
 
 Config objects apply in order, so a later object overrides an earlier one, just like ESLint. Nested arrays are flattened and falsy values are skipped, so you can spread presets and write `condition && config`.
 
-All of Oxlint's built-in plugins are enabled.
+No rules are on until you configure them. Use `recommended` or `all` to start.
 
 ## Composer
 
@@ -70,7 +70,7 @@ See [Composer](./docs/composer.md) for every method.
 ## Documentation
 
 - [Config objects](./docs/config-objects.md): how each kind of config object turns into Oxlint config.
-- [API](./docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile` and `category`.
+- [API](./docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile`, `category`, `recommended` and `all`.
 - [Composer](./docs/composer.md): the `@oxlint-flat-config/composer` API.
 - [Differences from ESLint](./docs/differences-from-eslint.md): what works differently because of Oxlint's config format.
 

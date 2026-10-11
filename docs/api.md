@@ -22,6 +22,21 @@ export default defineConfig(
 
 See [Config objects](./config-objects.md) for how each object is turned into Oxlint config.
 
+## `recommended` and `all`
+
+Ready-made config objects that set rules to `error`:
+
+- `recommended`: Oxlint's default rules, the correctness rules from `eslint`, `typescript`, `unicorn` and `oxc`.
+- `all`: every built-in rule except `nursery` ones. Some of them conflict, so use it with care.
+
+```ts
+import { defineConfig, recommended } from 'oxlint-flat-config'
+
+export default defineConfig(recommended, { rules: { 'eslint/no-debugger': 'off' } })
+```
+
+The rules come from the installed `oxlint`, so they can change when you upgrade it.
+
 ## `globalIgnores`
 
 ```ts

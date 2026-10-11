@@ -7,7 +7,7 @@ import path from 'node:path'
 import type { OxlintConfig } from 'oxlint'
 import { expect, it } from 'vite-plus/test'
 
-import { defineConfig } from '../src/index.ts'
+import { defineConfig, recommended } from '../src/index.ts'
 
 const oxlintDir = path.dirname(createRequire(import.meta.url).resolve('oxlint/package.json'))
 const oxlintBin = path.join(oxlintDir, 'bin/oxlint')
@@ -54,6 +54,15 @@ it('turns off a rule in a later config object', () => {
   expect(lint(defineConfig(enabled), files)).toEqual(['react(jsx-key)'])
   expect(
     lint(defineConfig(enabled, { files: ['**/*.tsx'], rules: { 'react/jsx-key': 'off' } }), files)
+  ).toEqual([])
+})
+
+it('runs recommended rules and lets later config objects disable them', () => {
+  const files = { 'a.js': 'debugger;\n' }
+
+  expect(lint(defineConfig(recommended), files)).toEqual(['eslint(no-debugger)'])
+  expect(
+    lint(defineConfig(recommended, { rules: { 'eslint/no-debugger': 'off' } }), files)
   ).toEqual([])
 })
 

@@ -17,11 +17,11 @@ pnpm add -D oxlint oxlint-flat-config
 Create an `oxlint.config.ts` and export the result of `defineConfig`:
 
 ```ts
-import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
+import { defineConfig, globalIgnores, recommended } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
-  await category({ correctness: 'error', plugins: ['eslint', 'typescript', 'unicorn'] }),
+  recommended,
   {
     name: 'base',
     rules: { 'no-console': 'warn' }
@@ -36,14 +36,14 @@ export default defineConfig(
 
 Config objects apply in order, so a later object overrides an earlier one, just like ESLint. Nested arrays are flattened and falsy values are skipped, so you can spread presets and write `condition && config`.
 
-All of Oxlint's built-in plugins are enabled.
+No rules are on until you configure them. Use `recommended` or `all` to start.
 
 To change part of a shared preset without copying it, see [`@oxlint-flat-config/composer`](https://github.com/liangmiQwQ/oxlint-flat-config/tree/main/packages/composer).
 
 ## Documentation
 
 - [Config objects](https://github.com/liangmiQwQ/oxlint-flat-config/blob/main/docs/config-objects.md): how each kind of config object turns into Oxlint config.
-- [API](https://github.com/liangmiQwQ/oxlint-flat-config/blob/main/docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile` and `category`.
+- [API](https://github.com/liangmiQwQ/oxlint-flat-config/blob/main/docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile`, `category`, `recommended` and `all`.
 - [Differences from ESLint](https://github.com/liangmiQwQ/oxlint-flat-config/blob/main/docs/differences-from-eslint.md): what works differently because of Oxlint's config format.
 
 ## License
