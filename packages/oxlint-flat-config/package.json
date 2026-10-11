@@ -2,6 +2,16 @@
   "name": "oxlint-flat-config",
   "version": "0.0.1",
   "description": "Compose Oxlint configs from ESLint-style flat config arrays.",
+  "keywords": [
+    "config",
+    "eslint",
+    "eslint-flat-config",
+    "flat-config",
+    "lint",
+    "linter",
+    "oxc",
+    "oxlint"
+  ],
   "homepage": "https://github.com/liangmiQwQ/oxlint-flat-config#readme",
   "bugs": {
     "url": "https://github.com/liangmiQwQ/oxlint-flat-config/issues"
@@ -10,7 +20,8 @@
   "author": "Liang Mi <hi@liangmi.dev>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/liangmiQwQ/oxlint-flat-config.git"
+    "url": "git+https://github.com/liangmiQwQ/oxlint-flat-config.git",
+    "directory": "packages/oxlint-flat-config"
   },
   "files": [
     "dist"
