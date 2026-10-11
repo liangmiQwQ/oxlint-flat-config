@@ -2,8 +2,8 @@ import { expect, it } from 'vite-plus/test'
 
 import { defineConfig } from '../src/index.ts'
 
-it('defineConfig', () => {
-  expect(defineConfig()).toEqual({})
+it('disables Oxlint default correctness rules and plugins when no config is given', () => {
+  expect(defineConfig()).toEqual({ categories: { correctness: 'off' }, plugins: [] })
 })
 
 it('keeps a later unscoped rule after an earlier scoped one', () => {
@@ -13,6 +13,7 @@ it('keeps a later unscoped rule after an earlier scoped one', () => {
       { categories: { correctness: 'error' }, rules: { 'no-console': 'off' } }
     )
   ).toEqual({
+    plugins: [],
     categories: { correctness: 'error' },
     overrides: [
       { files: ['src/**'], excludeFiles: [], rules: { 'no-console': 'error' } },
@@ -44,6 +45,7 @@ it('merges root-only fields of unscoped configs, a later one winning key by key'
       { categories: { perf: 'off' }, options: { typeAware: true } }
     )
   ).toEqual({
+    plugins: [],
     categories: { correctness: 'error', perf: 'off' },
     settings: { react: { version: '18' } },
     options: { typeAware: true }
@@ -63,7 +65,11 @@ it('turns global ignores into root-anchored `ignorePatterns`', () => {
       { ignores: ['dist', 'src/gen/**'] },
       { basePath: 'packages/a', ignores: ['*.log'] }
     )
-  ).toEqual({ ignorePatterns: ['/dist', '/src/gen/**', '/packages/a/*.log'] })
+  ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
+    ignorePatterns: ['/dist', '/src/gen/**', '/packages/a/*.log']
+  })
 })
 
 it('turns `files` and `ignores` into an override with `excludeFiles`', () => {
@@ -74,6 +80,8 @@ it('turns `files` and `ignores` into an override with `excludeFiles`', () => {
       rules: { 'no-console': 'error' }
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [
       {
         // Oxlint matches a pattern without `/` at any depth, so it is pinned to the base directory like ESLint.
@@ -94,6 +102,8 @@ it('resolves `files` and `ignores` against `basePath`', () => {
       rules: { 'no-console': 'error' }
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [
       {
         files: ['packages/a/*.ts'],
@@ -108,6 +118,8 @@ it('splits an AND group in `files` into included and excluded patterns', () => {
   expect(
     defineConfig({ files: [['src/**', '!src/legacy/**']], rules: { 'no-console': 'error' } })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [
       { files: ['src/**'], excludeFiles: ['src/legacy/**'], rules: { 'no-console': 'error' } }
     ]
@@ -136,6 +148,8 @@ it('places extended configs before the config, inheriting its `files` and `ignor
       rules: { 'no-debugger': 'warn' }
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [
       { files: ['src/**/*.ts'], excludeFiles: ['src/legacy/**'], rules: { 'no-console': 'error' } },
       { files: ['src/**'], excludeFiles: ['src/legacy/**'], rules: { 'no-debugger': 'warn' } }
@@ -150,6 +164,8 @@ it('passes `basePath` down to extended configs', () => {
       extends: [{ files: ['*.ts'], rules: { 'no-console': 'error' } }]
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [{ files: ['packages/a/*.ts'], excludeFiles: [], rules: { 'no-console': 'error' } }]
   })
 })
@@ -162,6 +178,8 @@ it('keeps global ignores in `extends` global', () => {
       rules: { 'no-console': 'error' }
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     ignorePatterns: ['/tmp'],
     overrides: [{ files: ['src/**'], excludeFiles: [], rules: { 'no-console': 'error' } }]
   })
@@ -171,6 +189,8 @@ it('does not turn a config with only `ignores` and `extends` into a global ignor
   expect(
     defineConfig({ ignores: ['src/legacy/**'], extends: [{ rules: { 'no-console': 'error' } }] })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [
       { files: ['**/*'], excludeFiles: ['src/legacy/**'], rules: { 'no-console': 'error' } }
     ]
@@ -196,6 +216,8 @@ it('inherits scope when files is explicitly undefined', () => {
       extends: [{ files: undefined, rules: { 'no-console': 'error' } }]
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [{ files: ['packages/a/**'], excludeFiles: [], rules: { 'no-console': 'error' } }]
   })
   expect(
@@ -204,6 +226,8 @@ it('inherits scope when files is explicitly undefined', () => {
       extends: [{ files: undefined, rules: { 'no-console': 'error' } }]
     })
   ).toEqual({
+    plugins: [],
+    categories: { correctness: 'off' },
     overrides: [{ files: ['src/**'], excludeFiles: [], rules: { 'no-console': 'error' } }]
   })
 })

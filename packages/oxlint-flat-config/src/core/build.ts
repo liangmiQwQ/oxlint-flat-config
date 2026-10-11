@@ -14,7 +14,9 @@ const ROOT_ONLY_KEYS = new Set(['categories', 'settings', 'options'])
 
 /** Builds an Oxlint config from flat config items, following their order. */
 export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {
-  let config: OxlintConfig = { categories: { correctness: 'off' } }
+  // To clear Oxlint's default config
+  let config: OxlintConfig = { categories: { correctness: 'off' }, plugins: [] }
+
   for (const item of items) {
     config = addItem(config, item)
   }
