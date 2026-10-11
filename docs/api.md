@@ -67,13 +67,8 @@ Oxlint already skips files listed in `.gitignore`, so you usually only need this
 
 ```ts
 async function category(
-  categories: RuleCategories,
-  options?: {
-    name?: string
-    plugins?: OxlintConfig['plugins']
-    files?: (string | string[])[]
-    ignores?: string[]
-  }
+  selection: RuleCategories & { plugins: OxlintConfig['plugins'] },
+  options?: { name?: string; files?: (string | string[])[]; ignores?: string[] }
 ): Promise<FlatConfigItem>
 ```
 
@@ -88,13 +83,13 @@ import preset from 'some-preset'
 export default defineConfig(
   preset,
   // Every correctness rule is an error, even the ones the preset turned off.
-  await category({ correctness: 'error' }),
-  await category({ style: 'warn' }, { files: ['src/**'] }),
-  await category({ correctness: 'error' }, { files: ['**/*.tsx'], plugins: ['react', 'jsx-a11y'] })
+  await category({ correctness: 'error', plugins: ['eslint', 'typescript'] }),
+  await category({ style: 'warn', plugins: ['eslint'] }, { files: ['src/**'] }),
+  await category({ correctness: 'error', plugins: ['react', 'jsx-a11y'] }, { files: ['**/*.tsx'] })
 )
 ```
 
-`plugins` picks which plugins' rules are included. It defaults to Oxlint's default plugins: `eslint`, `typescript`, `unicorn` and `oxc`. The object also enables those plugins, because Oxlint ignores an override's rules when their plugin is only enabled by another override ([oxc-project/oxc#27259](https://github.com/oxc-project/oxc/issues/27259)).
+`plugins` is required and picks which plugins' rules are included. The object also enables those plugins, because Oxlint ignores an override's rules when their plugin is only enabled by another override ([oxc-project/oxc#27259](https://github.com/oxc-project/oxc/issues/27259)).
 
 Pass `files` to scope it, and `ignores` to exclude files from that scope. The default name lists the categories, like `category correctness, perf`. The result can also be used in `extends`.
 

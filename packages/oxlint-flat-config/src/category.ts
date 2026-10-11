@@ -4,11 +4,14 @@ import type { DummyRuleMap, OxlintConfig, RuleCategories } from 'oxlint'
 
 import type { GlobalConfigItem, ScopedConfigItem } from './core/types.ts'
 
+export interface CategorySelection extends RuleCategories {
+  /** Only rules from these plugins are included, and the output config object enables them. */
+  plugins: Plugins
+}
+
 export interface CategoryOptions {
   /** The name to give the output config object. */
   name?: string
-  /** Only include rules from these plugins, and enable them. Defaults to Oxlint's default plugins. */
-  plugins?: Plugins
 }
 
 export interface ScopedCategoryOptions extends CategoryOptions {
@@ -20,9 +23,6 @@ export interface ScopedCategoryOptions extends CategoryOptions {
 type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'plugins' | 'rules'>
 type Plugins = NonNullable<OxlintConfig['plugins']>
 
-// Same as the plugins Oxlint enables when a config doesn't set `plugins`.
-const DEFAULT_PLUGINS: Plugins = ['eslint', 'typescript', 'unicorn', 'oxc']
-
 // Shared by every `category()` call, so Oxlint runs at most once per process.
 let rulesPromise: Promise<OxlintRule[]> | undefined
 
@@ -32,18 +32,17 @@ let rulesPromise: Promise<OxlintRule[]> | undefined
  * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
  */
 export async function category(
-  categories: RuleCategories,
+  selection: CategorySelection,
   options: ScopedCategoryOptions
 ): Promise<CategoryConfig & ScopedCategoryOptions>
 export async function category(
-  categories: RuleCategories,
+  selection: CategorySelection,
   options?: CategoryOptions
 ): Promise<CategoryConfig>
 export async function category(
-  categories: RuleCategories,
+  { plugins, ...categories }: CategorySelection,
   options: CategoryOptions | ScopedCategoryOptions = {}
 ): Promise<GlobalConfigItem | ScopedConfigItem> {
-  const plugins = options.plugins ?? DEFAULT_PLUGINS
   const rules = (await loadRules()).filter(rule => plugins.includes(toPluginName(rule)))
 
   // Oxlint drops an override's rules whose plugin is enabled by another override (oxc-project/oxc#27259), so the object enables its own plugins.
