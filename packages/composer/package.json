@@ -43,10 +43,10 @@
   },
   "devDependencies": {
     "oxlint": "catalog:",
-    "oxlint-flat-config": "workspace:^"
+    "oxlint-flat-config": "workspace:*"
   },
   "peerDependencies": {
     "oxlint": ">=1.85.0",
-    "oxlint-flat-config": "workspace:^"
+    "oxlint-flat-config": "^0.1.0"
   }
 }
