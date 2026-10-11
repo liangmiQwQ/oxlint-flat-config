@@ -5,13 +5,14 @@ import { category } from '../src/index.ts'
 it('expands categories into explicit rules with their own severity', async () => {
   const config = await category(
     { correctness: 'error', perf: 'warn' },
-    { files: ['src/**'], ignores: ['src/legacy/**'] }
+    { files: ['src/**'], ignores: ['src/legacy/**'], plugins: ['eslint', 'jsx-a11y', 'react-perf'] }
   )
 
   expect(config).toMatchObject({
     name: 'category correctness, perf',
     files: ['src/**'],
     ignores: ['src/legacy/**'],
+    plugins: ['eslint', 'jsx-a11y', 'react-perf'],
     rules: {
       'eslint/no-debugger': 'error',
       'jsx-a11y/alt-text': 'error',
@@ -26,4 +27,19 @@ it('applies to every file when no `files` is given', async () => {
 
   expect(config).not.toHaveProperty('files')
   expect(config).toMatchObject({ name: 'no style', rules: { 'eslint/curly': 'off' } })
+})
+
+it('only includes and enables the plugins it is given', async () => {
+  const config = await category({ correctness: 'error' }, { plugins: ['unicorn'] })
+
+  expect(config).toMatchObject({ plugins: ['unicorn'], rules: { 'unicorn/no-new-array': 'error' } })
+  expect(config.rules).not.toHaveProperty('eslint/no-debugger')
+})
+
+it("uses Oxlint's default plugins when no `plugins` is given", async () => {
+  const config = await category({ correctness: 'error' })
+
+  expect(config.plugins).toEqual(['eslint', 'typescript', 'unicorn', 'oxc'])
+  expect(config.rules).toHaveProperty('unicorn/no-new-array')
+  expect(config.rules).not.toHaveProperty('jsx-a11y/alt-text')
 })

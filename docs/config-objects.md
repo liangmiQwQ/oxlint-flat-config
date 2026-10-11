@@ -69,6 +69,7 @@ Turns into:
     {
       "files": ["**/*"],
       "excludeFiles": [],
+      "plugins": ["eslint", "typescript", "unicorn", "oxc"],
       "rules": { "eslint/no-debugger": "error" }
     },
     {
