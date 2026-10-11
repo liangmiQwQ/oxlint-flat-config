@@ -41,7 +41,9 @@ it('enables every built-in plugin in the root, ignoring `plugins` in config obje
     rules: { 'no-console': 'error' }
   })
 
-  expect(config.plugins).toEqual(schema.definitions.LintPluginOptionsSchema.enum)
+  expect(config.plugins?.toSorted()).toEqual(
+    schema.definitions.LintPluginOptionsSchema.enum.toSorted()
+  )
   expect(config.overrides?.[0]).not.toHaveProperty('plugins')
 })
 

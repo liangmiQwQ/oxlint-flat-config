@@ -1,17 +1,21 @@
+import { getOxlintPlugins } from 'get-oxlint-rules'
 import type { OxlintConfig, OxlintOverride } from 'oxlint'
 
 import type { ExpandedConfigItem } from './extends.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
 import { toIgnorePatterns, toOverridePaths } from './paths.ts'
-import { BUILTIN_PLUGINS } from './plugins.ts'
 import type { GlobalIgnoresItem } from './types.ts'
 
 type ConfigItem = Exclude<ExpandedConfigItem, GlobalIgnoresItem>
 type RootFields = Pick<OxlintConfig, 'settings' | 'options'>
 type OverrideFields = Omit<OxlintOverride, 'files' | 'excludeFiles'>
+type Plugins = NonNullable<OxlintConfig['plugins']>
 
 // Oxlint only reads these fields in the root config, not in `overrides`.
 const ROOT_ONLY_KEYS = new Set(['settings', 'options'])
+
+// Read from the installed Oxlint, so a new built-in plugin works without a release. Awaited at the top level to keep `defineConfig()` synchronous.
+const BUILTIN_PLUGINS = (await getOxlintPlugins()) as Plugins
 
 /** Builds an Oxlint config from flat config items, following their order. */
 export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {

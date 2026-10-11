@@ -5,7 +5,7 @@ catalog:
   '@liangmi/vp-config': ^0.7.0
   '@types/node': ^26.6.4
   '@typescript/native-preview': 7.0.0-dev.20260707.2
-  get-oxlint-rules: ^0.1.1
+  get-oxlint-rules: ^0.2.0
   glob-distribute: ^0.1.0
   oxlint: ^1.85.0
   'typescript': ^7.0.2
@@ -14,7 +14,7 @@ catalog:
 
 minimumReleaseAgeExclude:
   - '@liangmi/vp-config@0.7.0'
-  - get-oxlint-rules@0.1.1
+  - get-oxlint-rules@0.2.0
 
 overrides:
   'vite@*': 'catalog:'

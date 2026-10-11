@@ -63,7 +63,7 @@ Turns into:
 ```json
 {
   "categories": { "correctness": "off" },
-  "plugins": ["eslint", "react", "unicorn", "typescript"],
+  "plugins": ["eslint", "import", "jest", "jsdoc"],
   "ignorePatterns": ["/dist", "/coverage"],
   "overrides": [
     {
