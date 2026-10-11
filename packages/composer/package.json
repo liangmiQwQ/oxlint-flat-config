@@ -47,6 +47,6 @@
   },
   "peerDependencies": {
     "oxlint": ">=1.85.0",
-    "oxlint-flat-config": "^0.2.0"
+    "oxlint-flat-config": "^0.3.0"
   }
 }
