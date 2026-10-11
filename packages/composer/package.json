@@ -1,6 +1,6 @@
 {
   "name": "@oxlint-flat-config/composer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Change shared Oxlint flat configs with a chainable API.",
   "keywords": [
     "composer",
@@ -47,6 +47,6 @@
   },
   "peerDependencies": {
     "oxlint": ">=1.85.0",
-    "oxlint-flat-config": "^0.2.0"
+    "oxlint-flat-config": "^0.3.0"
   }
 }
