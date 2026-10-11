@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'release/*-pending']
   pull_request:
     types: [closed]
     branches: [main]
@@ -25,6 +25,34 @@ on:
 permissions: {}
 
 jobs:
+  # uppt's independent updater rebuilds the branch; hand edits only need metadata refreshed.
+  sync-pr:
+    if: |
+      github.event_name == 'push'
+      && startsWith(github.ref, 'refs/heads/release/')
+      && github.actor != 'github-actions[bot]'
+      && !github.event.deleted
+      && !github.event.repository.fork
+    runs-on: ubuntu-latest
+    concurrency:
+      group: sync-release-pr-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - run: npm run release:sync-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   # open or update a draft release PR from conventional commits
   pr:
     if: |

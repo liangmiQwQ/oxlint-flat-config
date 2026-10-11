@@ -18,6 +18,7 @@
     "build": "vp run -r build",
     "check": "vp run ccheck",
     "prepare": "vp config",
+    "release:sync-pr": "node scripts/sync-release-pr.ts",
     "test": "vp run -r test"
   },
   "devDependencies": {
