@@ -1,8 +1,13 @@
 import { getRules } from 'get-oxlint-rules'
 import type { OxlintRule } from 'get-oxlint-rules'
-import type { DummyRuleMap, RuleCategories } from 'oxlint'
+import type { DummyRuleMap, OxlintConfig, RuleCategories } from 'oxlint'
 
 import type { GlobalConfigItem, ScopedConfigItem } from './core/types.ts'
+
+export interface CategorySelection extends RuleCategories {
+  /** Only rules from these plugins are included, and the output config object enables them. */
+  plugins: Plugins
+}
 
 export interface CategoryOptions {
   /** The name to give the output config object. */
@@ -15,7 +20,8 @@ export interface ScopedCategoryOptions extends CategoryOptions {
 }
 
 // Category presets only contain rules and metadata, so they can also be used in extends.
-type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'rules'>
+type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'plugins' | 'rules'>
+type Plugins = NonNullable<OxlintConfig['plugins']>
 
 // Shared by every `category()` call, so Oxlint runs at most once per process.
 let rulesPromise: Promise<OxlintRule[]> | undefined
@@ -26,22 +32,24 @@ let rulesPromise: Promise<OxlintRule[]> | undefined
  * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
  */
 export async function category(
-  categories: RuleCategories,
+  selection: CategorySelection,
   options: ScopedCategoryOptions
 ): Promise<CategoryConfig & ScopedCategoryOptions>
 export async function category(
-  categories: RuleCategories,
+  selection: CategorySelection,
   options?: CategoryOptions
 ): Promise<CategoryConfig>
 export async function category(
-  categories: RuleCategories,
+  { plugins, ...categories }: CategorySelection,
   options: CategoryOptions | ScopedCategoryOptions = {}
 ): Promise<GlobalConfigItem | ScopedConfigItem> {
-  const rules = await loadRules()
+  const rules = (await loadRules()).filter(rule => plugins.includes(toPluginName(rule)))
 
+  // Oxlint drops an override's rules whose plugin is enabled by another override (oxc-project/oxc#27259), so the object enables its own plugins.
   return {
     ...options,
     name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
+    plugins,
     rules: toRuleMap(rules, categories)
   }
 }
@@ -60,6 +68,10 @@ function toRuleMap(rules: OxlintRule[], categories: RuleCategories): DummyRuleMa
 }
 
 function toRuleKey(rule: OxlintRule): string {
+  return `${toPluginName(rule)}/${rule.value}`
+}
+
+function toPluginName(rule: OxlintRule): Plugins[number] {
   // `Oxlint --rules` reports scopes like `jsx_a11y`, while configs name the plugin `jsx-a11y`.
-  return `${rule.scope.replaceAll('_', '-')}/${rule.value}`
+  return rule.scope.replaceAll('_', '-') as Plugins[number]
 }

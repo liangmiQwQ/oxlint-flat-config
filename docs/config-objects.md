@@ -42,7 +42,7 @@ import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
-  await category({ correctness: 'error' }),
+  await category({ correctness: 'error', plugins: ['eslint', 'typescript', 'unicorn'] }),
   {
     name: 'base',
     plugins: ['typescript', 'unicorn'],
@@ -69,6 +69,7 @@ Turns into:
     {
       "files": ["**/*"],
       "excludeFiles": [],
+      "plugins": ["eslint", "typescript", "unicorn"],
       "rules": { "eslint/no-debugger": "error" }
     },
     {

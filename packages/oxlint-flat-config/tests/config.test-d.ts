@@ -69,11 +69,18 @@ it('accepts helper results in extends', async () => {
       [globalIgnores(['dist'])],
       includeIgnoreFile('/repo/.gitignore'),
       includeIgnoreFile(['/repo/.gitignore']),
-      await category({ correctness: 'error' })
+      await category({ correctness: 'error', plugins: ['eslint'] })
     ]
   })
   defineConfig({
     files: ['src/**'],
-    extends: [await category({ correctness: 'error' }, { files: ['**/*.ts'] })]
+    extends: [
+      await category({ correctness: 'error', plugins: ['typescript'] }, { files: ['**/*.ts'] })
+    ]
   })
+})
+
+it('requires plugins in category()', async () => {
+  // @ts-expect-error -- plugins decide which rules are included and enabled
+  await category({ correctness: 'error' })
 })
