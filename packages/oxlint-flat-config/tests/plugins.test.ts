@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -9,10 +9,8 @@ import { expect, it } from 'vite-plus/test'
 
 import { defineConfig } from '../src/index.ts'
 
-const oxlintBin = path.join(
-  path.dirname(createRequire(import.meta.url).resolve('oxlint/package.json')),
-  'bin/oxlint'
-)
+const oxlintDir = path.dirname(createRequire(import.meta.url).resolve('oxlint/package.json'))
+const oxlintBin = path.join(oxlintDir, 'bin/oxlint')
 
 /** Lints the files with the config and returns the rules Oxlint reports, like `react(jsx-key)`. */
 function lint(config: OxlintConfig, files: Record<string, string>): string[] {
@@ -35,57 +33,15 @@ function lint(config: OxlintConfig, files: Record<string, string>): string[] {
   }
 }
 
-it('enables the plugins used by rules in the root config', () => {
-  const config = defineConfig(
-    { rules: { 'no-console': 'error', 'unicorn/no-null': 'error' } },
-    { files: ['**/*.tsx'], rules: { 'react/jsx-key': 'error', 'unicorn/no-null': 'off' } }
-  )
-
-  expect(config.plugins).toEqual(['eslint', 'react', 'unicorn'])
-  expect(config.overrides).toEqual([
-    expect.not.objectContaining({ plugins: expect.anything() }),
-    expect.not.objectContaining({ plugins: expect.anything() })
-  ])
-})
-
-it('understands the rule prefixes Oxlint accepts for its plugins', () => {
+it('enables every built-in plugin in the root, ignoring `plugins` in config objects', () => {
+  const schema = JSON.parse(readFileSync(path.join(oxlintDir, 'configuration_schema.json'), 'utf8'))
   const config = defineConfig({
-    rules: {
-      'eslint/no-debugger': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-      'react-hooks/rules-of-hooks': 'error',
-      'import-x/no-cycle': 'error',
-      '@next/next/no-img-element': 'error',
-      'deepscan/bad-array-method-on-arguments': 'error',
-      'jsx_a11y/alt-text': 'error',
-      'eslint-plugin-unicorn/no-null': 'error'
-    }
-  })
-
-  expect(config.plugins).toEqual([
-    'eslint',
-    'import',
-    'jsx-a11y',
-    'nextjs',
-    'oxc',
-    'react',
-    'typescript',
-    'unicorn'
-  ])
-})
-
-it('leaves rules of JS plugins to `jsPlugins`', () => {
-  expect(defineConfig({ rules: { 'my-plugin/some-rule': 'error' } }).plugins).toEqual([])
-})
-
-it('ignores `plugins` in config objects', () => {
-  const config = defineConfig({
-    // @ts-expect-error -- plugins are enabled from rules
+    // @ts-expect-error -- every built-in plugin is enabled
     plugins: ['vue'],
     rules: { 'no-console': 'error' }
   })
 
-  expect(config.plugins).toEqual(['eslint'])
+  expect(config.plugins).toEqual(schema.definitions.LintPluginOptionsSchema.enum)
   expect(config.overrides?.[0]).not.toHaveProperty('plugins')
 })
 
@@ -108,4 +64,20 @@ it('runs `import` rules that read other files', () => {
   expect(
     lint(defineConfig({ files: ['**/*.ts'], rules: { 'import/no-cycle': 'error' } }), files)
   ).toEqual(['import(no-cycle)'])
+})
+
+it('runs an unprefixed rule of a plugin other than ESLint', () => {
+  const files = { 'a.ts': 'export default 1\n' }
+
+  expect(lint(defineConfig({ rules: { 'no-default-export': 'error' } }), files)).toEqual([
+    'import(no-default-export)'
+  ])
+})
+
+it('runs an unprefixed rule shared by Jest and Vitest in a Vitest test file', () => {
+  const files = { 'a.test.ts': "import { it } from 'vitest'\nit.skip('a', () => {})\n" }
+
+  expect(lint(defineConfig({ rules: { 'no-disabled-tests': 'error' } }), files)).toEqual([
+    'jest(no-disabled-tests)'
+  ])
 })

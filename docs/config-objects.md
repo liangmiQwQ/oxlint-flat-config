@@ -32,7 +32,7 @@ When several global configs set `settings` or `options`, they are merged key by 
 
 There is no `categories` field, and `defineConfig` throws if one is set. Use [`category()`](./api.md#category) instead.
 
-There is no `plugins` field either. The built-in plugins your rules use are enabled automatically.
+There is no `plugins` field either. All of Oxlint's built-in plugins are enabled.
 
 ## Example
 
@@ -63,7 +63,7 @@ Turns into:
 ```json
 {
   "categories": { "correctness": "off" },
-  "plugins": ["eslint", "typescript", "unicorn"],
+  "plugins": ["eslint", "react", "unicorn", "typescript"],
   "ignorePatterns": ["/dist", "/coverage"],
   "overrides": [
     {
@@ -85,7 +85,7 @@ Turns into:
 }
 ```
 
-The first override lists every rule in the `correctness` category; only one is shown here. The root `categories` turns off Oxlint's default rules, so only the config objects decide which rules run. The root `plugins` lists the plugins of those rules.
+The first override lists every rule in the `correctness` category; only one is shown here. The root `categories` turns off Oxlint's default rules, so only the config objects decide which rules run. The root `plugins` lists every built-in plugin; only some are shown here.
 
 ## Patterns
 

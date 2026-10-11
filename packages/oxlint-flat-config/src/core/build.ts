@@ -3,7 +3,7 @@ import type { OxlintConfig, OxlintOverride } from 'oxlint'
 import type { ExpandedConfigItem } from './extends.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
 import { toIgnorePatterns, toOverridePaths } from './paths.ts'
-import { inferPlugins } from './plugins.ts'
+import { BUILTIN_PLUGINS } from './plugins.ts'
 import type { GlobalIgnoresItem } from './types.ts'
 
 type ConfigItem = Exclude<ExpandedConfigItem, GlobalIgnoresItem>
@@ -23,8 +23,8 @@ export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {
   }
 
   // Oxlint only runs an override's rules when their plugin is enabled in the root or the same override, and some `import` rules need it in the root.
-  // So every plugin the rules use is enabled in the root, replacing Oxlint's defaults. A plugin without enabled rules does nothing.
-  return { ...config, plugins: inferPlugins(config.overrides ?? []) }
+  // Every plugin is enabled, because Oxlint resolves an unprefixed rule name to a plugin before checking which plugins are enabled. A plugin without enabled rules does almost nothing.
+  return { ...config, plugins: [...BUILTIN_PLUGINS] }
 }
 
 function addItem(config: OxlintConfig, item: ExpandedConfigItem): OxlintConfig {

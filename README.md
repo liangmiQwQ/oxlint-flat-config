@@ -36,7 +36,7 @@ export default defineConfig(
 
 Config objects apply in order, so a later object overrides an earlier one, just like ESLint. Nested arrays are flattened and falsy values are skipped, so you can spread presets and write `condition && config`.
 
-Oxlint's built-in plugins are enabled automatically for the rules you use.
+All of Oxlint's built-in plugins are enabled.
 
 ## Composer
 
