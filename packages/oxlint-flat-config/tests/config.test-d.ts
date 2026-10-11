@@ -80,7 +80,12 @@ it('accepts helper results in extends', async () => {
   })
 })
 
+it('rejects plugins in config objects', () => {
+  // @ts-expect-error -- plugins are enabled from rules
+  void ({ plugins: ['react'], rules: { 'react/jsx-key': 'error' } } satisfies FlatConfigItem)
+})
+
 it('requires plugins in category()', async () => {
-  // @ts-expect-error -- plugins decide which rules are included and enabled
+  // @ts-expect-error -- plugins decide which rules are included
   await category({ correctness: 'error' })
 })

@@ -12,7 +12,6 @@ it('expands categories into explicit rules with their own severity', async () =>
     name: 'category correctness, perf',
     files: ['src/**'],
     ignores: ['src/legacy/**'],
-    plugins: ['eslint', 'jsx-a11y', 'react-perf'],
     rules: {
       'eslint/no-debugger': 'error',
       'jsx-a11y/alt-text': 'error',
@@ -29,9 +28,10 @@ it('applies to every file when no `files` is given', async () => {
   expect(config).toMatchObject({ name: 'no style', rules: { 'eslint/curly': 'off' } })
 })
 
-it('only includes and enables the plugins it is given', async () => {
+it('only includes rules of the plugins it is given', async () => {
   const config = await category({ correctness: 'error', plugins: ['unicorn'] })
 
-  expect(config).toMatchObject({ plugins: ['unicorn'], rules: { 'unicorn/no-new-array': 'error' } })
+  expect(config).not.toHaveProperty('plugins')
+  expect(config.rules).toHaveProperty('unicorn/no-new-array', 'error')
   expect(config.rules).not.toHaveProperty('eslint/no-debugger')
 })

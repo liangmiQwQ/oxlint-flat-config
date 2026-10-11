@@ -89,7 +89,7 @@ export default defineConfig(
 )
 ```
 
-`plugins` is required and picks which plugins' rules are included. The object also enables those plugins, because Oxlint ignores an override's rules when their plugin is only enabled by another override ([oxc-project/oxc#27259](https://github.com/oxc-project/oxc/issues/27259)).
+`plugins` is required and picks which plugins' rules are included.
 
 Pass `files` to scope it, and `ignores` to exclude files from that scope. The default name lists the categories, like `category correctness, perf`. The result can also be used in `extends`.
 
