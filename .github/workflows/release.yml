@@ -2,36 +2,117 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
+  # merged release PRs, publish reruns, and prereleases all arrive here
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Cut a prerelease instead of a normal release, e.g. `beta`, `rc`, or `0`'
+        required: false
+        default: ''
+      npm-tag:
+        description: 'npm dist-tag to publish to. Set by uppt/release for maintenance lines; leave blank otherwise'
+        required: false
+        default: ''
+      releases:
+        description: 'Publish payload emitted by uppt/release; leave empty when rerunning a publish by hand'
+        required: false
+        default: ''
+
+permissions: {}
 
 jobs:
-  release:
-    name: Release
+  # open or update a draft release PR from conventional commits
+  pr:
+    if: |
+      !github.event.repository.fork
+      && (
+        (
+          github.event_name == 'push'
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        ) || (
+          github.event_name == 'workflow_dispatch'
+          && !startsWith(github.ref, 'refs/tags/')
+        )
+      )
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-      id-token: write
-
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: danielroe/uppt/pr@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
         with:
-          fetch-depth: 0
-      - uses: voidzero-dev/setup-vp@v1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          mode: independent
+          packages: |
+            packages/*
+          scopes: |
+            oxlint-flat-config: core
+
+  # release PR merged: tag each package, cut a GitHub release, dispatch the publish run
+  release:
+    if: |
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/')
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && !github.event.repository.fork
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: danielroe/uppt/release@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
         with:
-          node-version-file: .node-version
-          cache: true
-          run-install: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mode: independent
+          packages: |
+            packages/*
 
-      - name: Build
-        run: vp run build
+  # the chained dispatch lands here on the release tag; build the tarball(s)
+  pack:
+    if: |
+      github.event_name == 'workflow_dispatch'
+      && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/release-'))
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pack-${{ github.ref }}
+      cancel-in-progress: false
+    permissions: {}
+    outputs:
+      files: ${{ steps.pack.outputs.files }}
+    steps:
+      - id: pack
+        uses: danielroe/uppt/pack@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
+        with:
+          releases: ${{ inputs.releases }}
+          packages: |
+            packages/*
 
-      - name: Generate GitHub Changelog
-        run: vpx changelogithub
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish to NPM
-        run: vp pm publish -r --access public --no-git-checks
+  # stage the prebuilt tarball(s) to npm via OIDC
+  publish:
+    if: |
+      github.event_name == 'workflow_dispatch'
+      && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/release-'))
+      && needs.pack.outputs.files != '[]'
+    needs: pack
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+    environment: npm
+    steps:
+      - uses: danielroe/uppt/publish@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
+        with:
+          files: ${{ needs.pack.outputs.files }}
+          npm-tag: ${{ inputs.npm-tag }}
+          releases: ${{ inputs.releases }}

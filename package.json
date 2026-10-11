@@ -18,14 +18,12 @@
     "build": "vp run -r build",
     "check": "vp run ccheck",
     "prepare": "vp config",
-    "release": "bumpp -r",
     "test": "vp run -r test"
   },
   "devDependencies": {
     "@liangmi/vp-config": "catalog:",
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
-    "bumpp": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
