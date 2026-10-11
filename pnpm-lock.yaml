@@ -174,8 +174,8 @@ catalogs:
       specifier: 7.0.0-dev.20260707.2
       version: 7.0.0-dev.20260707.2
     get-oxlint-rules:
-      specifier: ^0.1.1
-      version: 0.1.1
+      specifier: ^0.2.0
+      version: 0.2.0
     glob-distribute:
       specifier: ^0.1.0
       version: 0.1.0
@@ -231,7 +231,7 @@ importers:
     dependencies:
       get-oxlint-rules:
         specifier: 'catalog:'
-        version: 0.1.1
+        version: 0.2.0
       glob-distribute:
         specifier: 'catalog:'
         version: 0.1.0
@@ -1133,8 +1133,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  get-oxlint-rules@0.1.1:
-    resolution: {integrity: sha512-oCgcTcfSatpHnCZth8MTlwX7TXKtb0y9gDBC8g9Ari6g4GnzxcbKCZt1LO8dwIBJvf4aGZGuIgGU2dSG71UtAA==}
+  get-oxlint-rules@0.2.0:
+    resolution: {integrity: sha512-UtEsGw8V9MZg7b0doS73vpBGll4Dj40zpaK5PbNDFhEdhL3s/Zz9eKiMYG+PhA8eY+3g7PZ3aAcfSs1rZG8IOA==}
 
   glob-distribute@0.1.0:
     resolution: {integrity: sha512-Z+EYFkNVV8e7BeciaFg5j6PyzyOsTQscXOH1SKmtGavMaRWjmW4U9n6+cN08VlRgyolYM1SD0gUsWL/pkQgJ+Q==}
@@ -1985,7 +1985,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  get-oxlint-rules@0.1.1:
+  get-oxlint-rules@0.2.0:
     dependencies:
       find-cache-dir: 6.0.0
       tinyexec: 1.3.1

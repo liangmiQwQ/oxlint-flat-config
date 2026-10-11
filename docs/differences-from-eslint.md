@@ -34,7 +34,7 @@ The patterns also don't behave exactly like the ones you would write in Oxlint's
 
 ## `plugins`
 
-Config objects have no `plugins` field. Oxlint's built-in plugins are enabled automatically for the rules you use. Plugins written for ESLint go in `jsPlugins`.
+Config objects have no `plugins` field. All of Oxlint's built-in plugins are enabled. Plugins written for ESLint go in `jsPlugins`.
 
 ## `extends`
 
