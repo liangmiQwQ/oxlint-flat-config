@@ -25,7 +25,6 @@ function mergeConfigs(config: FlatConfigItem, patch: FlatConfigItem): FlatConfig
     files: concat(config.files, patch.files),
     ignores: concat(config.ignores, patch.ignores),
     extends: concat(config.extends, patch.extends),
-    plugins: concat(config.plugins, patch.plugins),
     jsPlugins: concat(config.jsPlugins, patch.jsPlugins),
     settings: mergeRecords(config.settings, patch.settings),
     options: mergeRecords(config.options, patch.options),

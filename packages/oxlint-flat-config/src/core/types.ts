@@ -62,8 +62,6 @@ export interface ConfigFields {
   settings?: OxlintConfig['settings']
   options?: OxlintConfig['options']
 
-  /** Built-in Rust plugins to enable. Overwrites Oxlint's default plugin set. */
-  plugins?: OxlintConfig['plugins']
   /** ESLint-compatible JS plugins. */
   jsPlugins?: ExternalPluginEntry[]
   rules?: DummyRuleMap

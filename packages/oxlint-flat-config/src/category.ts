@@ -5,7 +5,7 @@ import type { DummyRuleMap, OxlintConfig, RuleCategories } from 'oxlint'
 import type { GlobalConfigItem, ScopedConfigItem } from './core/types.ts'
 
 export interface CategorySelection extends RuleCategories {
-  /** Only rules from these plugins are included, and the output config object enables them. */
+  /** Only rules from these plugins are included. */
   plugins: Plugins
 }
 
@@ -20,7 +20,7 @@ export interface ScopedCategoryOptions extends CategoryOptions {
 }
 
 // Category presets only contain rules and metadata, so they can also be used in extends.
-type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'plugins' | 'rules'>
+type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'rules'>
 type Plugins = NonNullable<OxlintConfig['plugins']>
 
 // Shared by every `category()` call, so Oxlint runs at most once per process.
@@ -45,11 +45,9 @@ export async function category(
 ): Promise<GlobalConfigItem | ScopedConfigItem> {
   const rules = (await loadRules()).filter(rule => plugins.includes(toPluginName(rule)))
 
-  // Oxlint drops an override's rules whose plugin is enabled by another override (oxc-project/oxc#27259), so the object enables its own plugins.
   return {
     ...options,
     name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
-    plugins,
     rules: toRuleMap(rules, categories)
   }
 }

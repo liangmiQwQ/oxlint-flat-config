@@ -3,6 +3,7 @@ import type { OxlintConfig, OxlintOverride } from 'oxlint'
 import type { ExpandedConfigItem } from './extends.ts'
 import { isGlobalIgnores } from './global-ignores.ts'
 import { toIgnorePatterns, toOverridePaths } from './paths.ts'
+import { inferPlugins } from './plugins.ts'
 import type { GlobalIgnoresItem } from './types.ts'
 
 type ConfigItem = Exclude<ExpandedConfigItem, GlobalIgnoresItem>
@@ -14,13 +15,16 @@ const ROOT_ONLY_KEYS = new Set(['settings', 'options'])
 
 /** Builds an Oxlint config from flat config items, following their order. */
 export function buildOxlintConfig(items: ExpandedConfigItem[]): OxlintConfig {
-  // To clear Oxlint's default config
-  let config: OxlintConfig = { categories: { correctness: 'off' }, plugins: [] }
+  // To clear Oxlint's default rules
+  let config: OxlintConfig = { categories: { correctness: 'off' } }
 
   for (const item of items) {
     config = addItem(config, item)
   }
-  return config
+
+  // Oxlint only runs an override's rules when their plugin is enabled in the root or the same override, and some `import` rules need it in the root.
+  // So every plugin the rules use is enabled in the root, replacing Oxlint's defaults. A plugin without enabled rules does nothing.
+  return { ...config, plugins: inferPlugins(config.overrides ?? []) }
 }
 
 function addItem(config: OxlintConfig, item: ExpandedConfigItem): OxlintConfig {
@@ -80,8 +84,8 @@ function toRootFields(item: ConfigItem): RootFields {
 }
 
 function toOverrideFields(item: ConfigItem): OverrideFields {
-  const { plugins, jsPlugins, rules, env, globals } = item
-  return withoutUndefined({ plugins, jsPlugins, rules, env, globals })
+  const { jsPlugins, rules, env, globals } = item
+  return withoutUndefined({ jsPlugins, rules, env, globals })
 }
 
 function mergeRecords<T extends object>(base: T | undefined, next: T | undefined): T | undefined {

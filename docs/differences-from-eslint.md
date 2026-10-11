@@ -34,7 +34,7 @@ The patterns also don't behave exactly like the ones you would write in Oxlint's
 
 ## `plugins`
 
-`plugins` lists Oxlint's built-in plugins by name, like `['typescript', 'unicorn']`, instead of an object of plugin modules. Setting it replaces Oxlint's default plugin set, so include every plugin you want. Plugins written for ESLint go in `jsPlugins`.
+Config objects have no `plugins` field. Oxlint's built-in plugins are enabled automatically for the rules you use. Plugins written for ESLint go in `jsPlugins`.
 
 ## `extends`
 

@@ -21,7 +21,6 @@ Oxlint applies every override after the root config. That is why rules from a gl
 | `extends`   | Configs placed before this one. See [Extends](#extends).                                      |
 | `settings`  | Plugin settings. Global config only.                                                          |
 | `options`   | Oxlint options such as `typeAware`. Global config only.                                       |
-| `plugins`   | Built-in plugins to enable. Overwrites Oxlint's default plugin set.                           |
 | `jsPlugins` | ESLint-compatible JS plugins.                                                                 |
 | `rules`     | Rule settings.                                                                                |
 | `env`       | Environments, such as `browser` or `node`.                                                    |
@@ -32,6 +31,8 @@ Oxlint only reads `settings` and `options` in the root config, so a scoped confi
 When several global configs set `settings` or `options`, they are merged key by key and the later one wins.
 
 There is no `categories` field, and `defineConfig` throws if one is set. Use [`category()`](./api.md#category) instead.
+
+There is no `plugins` field either. The built-in plugins your rules use are enabled automatically.
 
 ## Example
 
@@ -45,7 +46,6 @@ export default defineConfig(
   await category({ correctness: 'error', plugins: ['eslint', 'typescript', 'unicorn'] }),
   {
     name: 'base',
-    plugins: ['typescript', 'unicorn'],
     rules: { 'no-console': 'warn' }
   },
   {
@@ -63,19 +63,17 @@ Turns into:
 ```json
 {
   "categories": { "correctness": "off" },
-  "plugins": [],
+  "plugins": ["eslint", "typescript", "unicorn"],
   "ignorePatterns": ["/dist", "/coverage"],
   "overrides": [
     {
       "files": ["**/*"],
       "excludeFiles": [],
-      "plugins": ["eslint", "typescript", "unicorn"],
       "rules": { "eslint/no-debugger": "error" }
     },
     {
       "files": ["**/*"],
       "excludeFiles": [],
-      "plugins": ["typescript", "unicorn"],
       "rules": { "no-console": "warn" }
     },
     {
@@ -87,7 +85,7 @@ Turns into:
 }
 ```
 
-The first override lists every rule in the `correctness` category; only one is shown here. The root `categories` and `plugins` turn off Oxlint's defaults, so only the config objects decide which rules run.
+The first override lists every rule in the `correctness` category; only one is shown here. The root `categories` turns off Oxlint's default rules, so only the config objects decide which rules run. The root `plugins` lists the plugins of those rules.
 
 ## Patterns
 
