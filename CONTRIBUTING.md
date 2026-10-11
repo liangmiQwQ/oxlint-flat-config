@@ -47,6 +47,8 @@ Your PR title should follow [conventional commit format](https://www.conventiona
 - `fix: resolve memory leak in data processor`
 - `docs: update API documentation`
 
+Packages are released independently based on the commit scope. Use `core` for changes to `oxlint-flat-config` (e.g. `feat(core): add ...`) and `composer` for changes to `@oxlint-flat-config/composer`. Commits without one of these scopes do not trigger a release.
+
 If your PR hasn't been reviewed within two weeks, please:
 
 - Mention relevant maintainers using `@liangmiQwQ`

@@ -27,7 +27,7 @@
     "build": "vp run cpack",
     "check": "vp run ccheck",
     "dev": "vp pack --watch",
-    "prepublishOnly": "vp run build",
+    "prepack": "vp run build",
     "test": "vp run ctest"
   },
   "dependencies": {
