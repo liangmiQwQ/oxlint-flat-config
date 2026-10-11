@@ -97,7 +97,7 @@ jobs:
           packages: |
             packages/*
 
-  # stage the prebuilt tarball(s) to npm via OIDC
+  # publish the prebuilt tarball(s) directly to npm via OIDC
   publish:
     if: |
       github.event_name == 'workflow_dispatch'
@@ -112,8 +112,47 @@ jobs:
       id-token: write
     environment: npm
     steps:
-      - uses: danielroe/uppt/publish@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          files: ${{ needs.pack.outputs.files }}
-          npm-tag: ${{ inputs.npm-tag }}
-          releases: ${{ inputs.releases }}
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+      - name: Update npm
+        run: npm install -g npm@latest
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: uppt-tarball
+          path: ${{ runner.temp }}/uppt-tarballs
+      - name: Publish to npm
+        env:
+          TARBALL_DIR: ${{ runner.temp }}/uppt-tarballs
+          TARBALL_FILES: ${{ needs.pack.outputs.files }}
+          NPM_TAG: ${{ inputs.npm-tag }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process'
+          import { basename, resolve } from 'node:path'
+
+          const files = JSON.parse(process.env.TARBALL_FILES)
+          if (!Array.isArray(files) || files.length === 0) {
+            throw new Error('Expected a non-empty list of tarballs from uppt/pack')
+          }
+
+          // Preserve pack order so workspace dependencies are published first.
+          for (const file of files) {
+            if (typeof file !== 'string' || basename(file) !== file) {
+              throw new Error(`Invalid tarball filename: ${file}`)
+            }
+            const version = file.match(/-(\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?)\.tgz$/)?.[1]
+            if (!version) throw new Error(`Cannot determine version from ${file}`)
+
+            // Keep prereleases off latest, including numeric prereleases such as 0.1.0-0.
+            const prerelease = version.split('+')[0].split('-').slice(1).join('-')
+            const identifier = prerelease.replace(/(?:^|\.)\d+$/, '')
+            const tag = process.env.NPM_TAG?.trim() || (prerelease ? identifier || 'next' : 'latest')
+            execFileSync('npm', [
+              'publish', resolve(process.env.TARBALL_DIR, file),
+              '--provenance', '--ignore-scripts', '--access=public', `--tag=${tag}`
+            ], { stdio: 'inherit' })
+          }
+          NODE
