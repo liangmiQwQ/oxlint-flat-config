@@ -58,7 +58,7 @@ export default await composer(preset)
   .remove('preset/stylistic')
   .removeRules('no-alert')
   // Add your own objects at the end, or next to a named one.
-  .insertAfter('preset/base', { files: ['scripts/**'], rules: { 'no-process-exit': 'off' } })
+  .insertAfter('preset/base', { files: ['*.js'], rules: { 'no-process-exit': 'off' } })
   .append({ files: ['**/*.test.ts'], rules: { 'no-console': 'off' } })
 ```
 
