@@ -27,7 +27,6 @@ function mergeConfigs(config: FlatConfigItem, patch: FlatConfigItem): FlatConfig
     extends: concat(config.extends, patch.extends),
     plugins: concat(config.plugins, patch.plugins),
     jsPlugins: concat(config.jsPlugins, patch.jsPlugins),
-    categories: mergeRecords(config.categories, patch.categories),
     settings: mergeRecords(config.settings, patch.settings),
     options: mergeRecords(config.options, patch.options),
     rules: mergeRecords(config.rules, patch.rules),
