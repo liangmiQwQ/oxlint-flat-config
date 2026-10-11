@@ -37,12 +37,38 @@ export default defineConfig(
 
 Config objects apply in order, so a later object overrides an earlier one, just like ESLint. Nested arrays are flattened and falsy values are skipped, so you can spread presets and write `condition && config`.
 
-## Packages
+## Composer
 
-| Package                                               | Description                                                        |
-| ----------------------------------------------------- | ------------------------------------------------------------------ |
-| [`oxlint-flat-config`](./packages/oxlint-flat-config) | `defineConfig` and helpers for writing flat configs.               |
-| [`@oxlint-flat-config/composer`](./packages/composer) | A chainable API to change configs, for example ones from a preset. |
+When a config comes from a shared preset, you often want to change part of it without copying the whole thing. `@oxlint-flat-config/composer` lets you do that with a chain of steps that find config objects by `name`:
+
+```bash
+pnpm add -D oxlint @oxlint-flat-config/composer
+```
+
+`oxlint-flat-config` is a dependency of the composer and comes with it. Add it to your own `package.json` only when you import its helpers, such as `globalIgnores` or `category`, since package managers like pnpm don't let you import packages you haven't declared:
+
+```bash
+pnpm add -D oxlint @oxlint-flat-config/composer oxlint-flat-config
+```
+
+```ts
+import { composer } from '@oxlint-flat-config/composer'
+import preset from 'some-preset'
+
+export default await composer(preset)
+  // Merge into one object of the preset.
+  .override('preset/typescript', { rules: { 'typescript/no-explicit-any': 'off' } })
+  // Drop objects or rules you don't want.
+  .remove('preset/stylistic')
+  .removeRules('no-alert')
+  // Add your own objects at the end, or next to a named one.
+  .insertAfter('preset/base', { files: ['scripts/**'], rules: { 'no-process-exit': 'off' } })
+  .append({ files: ['**/*.test.ts'], rules: { 'no-console': 'off' } })
+```
+
+`composer()` accepts the same inputs as `defineConfig`, plus promises. The steps run in order when you `await` it, and the result is the same Oxlint config `defineConfig` would build. Every method returns a new composer, so a preset can export a composer and each project can keep chaining on it.
+
+See [Composer](./docs/composer.md) for every method.
 
 ## Documentation
 
@@ -53,8 +79,9 @@ Config objects apply in order, so a later object overrides an earlier one, just 
 
 ## Credits
 
-- [ESLint](https://github.com/eslint) team creates ESLint flat config, which is the foundation of this entire project.
-- [Anthony Fu](https://github.com/antfu) creates [eslint-flat-config-utils](https://github.com/antfu/eslint-flat-config-utils), our `@oxlint-flat-config/composer` is basically an Oxlint version of it.
+Thanks to [ESLint](https://github.com/eslint) team who creates ESLint flat config, which is the foundation of this entire project.
+
+Thanks to [Anthony Fu](https://github.com/antfu) who creates [eslint-flat-config-utils](https://github.com/antfu/eslint-flat-config-utils), our `@oxlint-flat-config/composer` is basically an Oxlint version of it.
 
 ## License
 
