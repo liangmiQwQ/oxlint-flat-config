@@ -8,7 +8,9 @@ Vite+ is used as the project manager and dev toolchain for JavaScript part. Chec
 
 ## Project Layout
 
-This is a pnpm workspace. The published package lives in `packages/oxlint-flat-config`. The root `package.json` is private and only runs workspace scripts.
+This is a pnpm workspace. The published packages live in `packages/`: `oxlint-flat-config` is the core package, and `@oxlint-flat-config/composer` (in `packages/composer`) builds on it. The root `package.json` is private and only runs workspace scripts.
+
+User documentation lives in `README.md` and `docs/`. Update it when you change public behavior.
 
 Vite+ only reads `lint` and `fmt` from the root `vite.config.ts`, so put lint and format changes there. Package configs only set `pack`, `test` and `run`.
 
