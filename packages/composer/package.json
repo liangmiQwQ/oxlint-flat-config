@@ -1,7 +1,17 @@
 {
   "name": "@oxlint-flat-config/composer",
   "version": "0.0.0",
-  "description": "Utilities for composing Oxlint flat configs.",
+  "description": "Change shared Oxlint flat configs with a chainable API.",
+  "keywords": [
+    "composer",
+    "config",
+    "flat-config",
+    "lint",
+    "linter",
+    "oxc",
+    "oxlint",
+    "preset"
+  ],
   "homepage": "https://github.com/liangmiQwQ/oxlint-flat-config#readme",
   "bugs": {
     "url": "https://github.com/liangmiQwQ/oxlint-flat-config/issues"
