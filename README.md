@@ -42,14 +42,10 @@ Config objects apply in order, so a later object overrides an earlier one, just 
 When a config comes from a shared preset, you often want to change part of it without copying the whole thing. `@oxlint-flat-config/composer` lets you do that with a chain of steps that find config objects by `name`:
 
 ```bash
-pnpm add -D oxlint @oxlint-flat-config/composer
+pnpm add -D oxlint oxlint-flat-config @oxlint-flat-config/composer
 ```
 
-`oxlint-flat-config` is a dependency of the composer and comes with it. Add it to your own `package.json` only when you import its helpers, such as `globalIgnores` or `category`, since package managers like pnpm don't let you import packages you haven't declared:
-
-```bash
-pnpm add -D oxlint @oxlint-flat-config/composer oxlint-flat-config
-```
+`oxlint` and `oxlint-flat-config` are both peer dependencies, so the composer uses your project's own copies and there is only ever one `oxlint-flat-config`.
 
 ```ts
 import { composer } from '@oxlint-flat-config/composer'

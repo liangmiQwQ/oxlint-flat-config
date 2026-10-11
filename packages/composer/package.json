@@ -31,13 +31,12 @@
     "prepublishOnly": "vp run build",
     "test": "vp run ctest"
   },
-  "dependencies": {
+  "devDependencies": {
+    "oxlint": "catalog:",
     "oxlint-flat-config": "workspace:^"
   },
-  "devDependencies": {
-    "oxlint": "catalog:"
-  },
   "peerDependencies": {
-    "oxlint": ">=1.85.0"
+    "oxlint": ">=1.85.0",
+    "oxlint-flat-config": "workspace:^"
   }
 }
