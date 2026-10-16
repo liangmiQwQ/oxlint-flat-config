@@ -226,6 +226,9 @@ importers:
       oxlint-flat-config:
         specifier: workspace:^
         version: link:../oxlint-flat-config
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.0.0-rc.1(@types/node@26.6.4)(@vitest/ui@5.0.1)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
 
   packages/oxlint-flat-config:
     dependencies:

@@ -29,6 +29,10 @@ It is Vite+'s own `defineConfig`, except that `lint` takes the same inputs as [`
 
 Everything else in [API](./api.md), like `globalIgnores`, `category`, `recommended` and `all`, is also exported from `oxlint-flat-config/vite-plus`. Import them from there, so the rule lists match the Oxlint that `vp lint` runs.
 
+## Composer
+
+To change a shared preset in the `lint` block, use `composer` from `@oxlint-flat-config/composer/vite-plus`. See [Composer](./composer.md#vite).
+
 ## Notes
 
 - Paths in `files`, `ignores` and `basePath` are relative to `vite.config.ts`.
