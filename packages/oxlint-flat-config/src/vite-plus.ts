@@ -72,7 +72,9 @@ function toViteConfigExport(config: UserConfigExport): ViteUserConfigExport {
 function toViteConfigAwaitable(
   config: UserConfig | Promise<UserConfig>
 ): ViteUserConfig | Promise<ViteUserConfig> {
-  return config instanceof Promise ? config.then(toViteConfig) : toViteConfig(config)
+  return typeof (config as PromiseLike<UserConfig>)?.then === 'function'
+    ? Promise.resolve(config).then(toViteConfig)
+    : toViteConfig(config as UserConfig)
 }
 
 function toViteConfig({ lint, ...config }: UserConfig): ViteUserConfig {
