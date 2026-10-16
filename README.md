@@ -10,8 +10,6 @@ Oxlint's config has one root object plus a list of `overrides`, so it is hard to
 pnpm add -D oxlint oxlint-flat-config
 ```
 
-`oxlint` is a peer dependency, version `1.85.0` or later.
-
 ## Usage
 
 Create an `oxlint.config.ts` and export the result of `defineConfig`:
@@ -38,7 +36,7 @@ Config objects apply in order, so a later object overrides an earlier one, just 
 
 No rules are on until you configure them. Use `recommended` or `all` to start.
 
-## Vite+
+### Using with Vite+
 
 With [Vite+](https://viteplus.dev), write the `lint` block of `vite.config.ts` as a flat config array instead. You don't need to install `oxlint`:
 
@@ -50,17 +48,17 @@ export default defineConfig({
 })
 ```
 
-See [Vite+](./docs/vite-plus.md) for details.
+See [Using with Vite+](./docs/vite-plus.md) for details.
 
 ## Composer
 
 When a config comes from a shared preset, you often want to change part of it without copying the whole thing. `@oxlint-flat-config/composer` lets you do that with a chain of steps that find config objects by `name`:
 
 ```bash
-pnpm add -D oxlint oxlint-flat-config @oxlint-flat-config/composer
+pnpm add -D oxlint-flat-config @oxlint-flat-config/composer
 ```
 
-`oxlint` and `oxlint-flat-config` are both peer dependencies, so the composer uses your project's own copies and there is only ever one `oxlint-flat-config`.
+`oxlint-flat-config` is a peer dependency, so the composer uses your project's own copy and there is only ever one `oxlint-flat-config`.
 
 ```ts
 import { composer } from '@oxlint-flat-config/composer'
@@ -86,7 +84,7 @@ See [Composer](./docs/composer.md) for every method.
 - [Config objects](./docs/config-objects.md): how each kind of config object turns into Oxlint config.
 - [API](./docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile`, `category`, `recommended` and `all`.
 - [Composer](./docs/composer.md): the `@oxlint-flat-config/composer` API.
-- [Vite+](./docs/vite-plus.md): writing the `lint` block of `vite.config.ts` as flat config.
+- [Using with Vite+](./docs/vite-plus.md): writing the `lint` block of `vite.config.ts` as flat config.
 - [Differences from ESLint](./docs/differences-from-eslint.md): what works differently because of Oxlint's config format.
 
 ## Credits

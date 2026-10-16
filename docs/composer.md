@@ -3,10 +3,10 @@
 `@oxlint-flat-config/composer` gives you a chainable API to change a list of config objects, for example to adjust a shared preset without copying it.
 
 ```bash
-pnpm add -D oxlint oxlint-flat-config @oxlint-flat-config/composer
+pnpm add -D oxlint-flat-config @oxlint-flat-config/composer
 ```
 
-`oxlint` and `oxlint-flat-config` are both peer dependencies, so the composer uses your project's own copies and there is only ever one `oxlint-flat-config`.
+`oxlint-flat-config` is a peer dependency, so the composer uses your project's own copy and there is only ever one `oxlint-flat-config`.
 
 ```ts
 import { composer } from '@oxlint-flat-config/composer'

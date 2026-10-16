@@ -1,4 +1,4 @@
-# Vite+
+# Using with Vite+
 
 [Vite+](https://viteplus.dev) reads its lint config from the `lint` block in `vite.config.ts`. `oxlint-flat-config/vite-plus` lets you write that block as a flat config array.
 

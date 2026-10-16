@@ -10,8 +10,6 @@ Oxlint's config has one root object plus a list of `overrides`, so it is hard to
 pnpm add -D oxlint oxlint-flat-config
 ```
 
-`oxlint` is a peer dependency, version `1.85.0` or later.
-
 ## Usage
 
 Create an `oxlint.config.ts` and export the result of `defineConfig`:

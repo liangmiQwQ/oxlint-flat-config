@@ -7,10 +7,10 @@ When a config comes from a shared preset, you often want to change part of it wi
 ## Install
 
 ```bash
-pnpm add -D oxlint oxlint-flat-config @oxlint-flat-config/composer
+pnpm add -D oxlint-flat-config @oxlint-flat-config/composer
 ```
 
-`oxlint` and `oxlint-flat-config` are both peer dependencies, so the composer uses your project's own copies and there is only ever one `oxlint-flat-config`.
+`oxlint-flat-config` is a peer dependency, so the composer uses your project's own copy and there is only ever one `oxlint-flat-config`.
 
 ## Usage
 
