@@ -82,7 +82,7 @@ Oxlint already skips files listed in `.gitignore`, so you usually only need this
 
 ```ts
 function category(
-  selection: RuleCategories & { plugins: OxlintConfig['plugins'] },
+  selection: RuleCategories & { plugins: NonNullable<OxlintConfig['plugins']> },
   options?: { name?: string; files?: (string | string[])[]; ignores?: string[] }
 ): FlatConfigItem
 ```

@@ -7,7 +7,7 @@ Oxlint's config has one root object plus a list of `overrides`, so it is hard to
 ## Install
 
 ```bash
-pnpm add -D oxlint oxlint-flat-config
+pnpm add -D oxlint-flat-config
 ```
 
 ## Usage
