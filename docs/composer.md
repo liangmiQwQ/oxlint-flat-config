@@ -81,3 +81,18 @@ composer(preset).overrideRules({ 'no-console': 'warn' })
 Removes the rules from every object that sets them.
 
 Both `overrideRules` and `removeRules` compare rule names as written, so `no-console` doesn't match `eslint/no-console`. [`category()`](./api.md#category) always writes the plugin prefix.
+
+## Vite+
+
+With [Vite+](./vite-plus.md), import `composer` from `@oxlint-flat-config/composer/vite-plus`. It takes a whole Vite+ config, runs every step on its `lint` block, and resolves to the config that [`defineConfig`](./vite-plus.md#usage) from `oxlint-flat-config/vite-plus` would build:
+
+```ts
+import { composer } from '@oxlint-flat-config/composer/vite-plus'
+import preset from 'some-preset'
+
+export default await composer({ fmt: { semi: false }, lint: preset })
+  .override('preset/typescript', { rules: { 'typescript/no-explicit-any': 'off' } })
+  .remove('preset/stylistic')
+```
+
+`lint` takes the same inputs as `composer()`, including promises. Other fields are passed to Vite+ unchanged.
