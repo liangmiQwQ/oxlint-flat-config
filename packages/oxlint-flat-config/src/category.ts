@@ -32,23 +32,19 @@ export function createCategory(rules: OxlintRule[]) {
   function category(
     selection: CategorySelection,
     options: ScopedCategoryOptions
-  ): Promise<CategoryConfig & ScopedCategoryOptions>
-  function category(
-    selection: CategorySelection,
-    options?: CategoryOptions
-  ): Promise<CategoryConfig>
-  // Returns a promise to keep the API from when `category()` loaded rules itself.
+  ): CategoryConfig & ScopedCategoryOptions
+  function category(selection: CategorySelection, options?: CategoryOptions): CategoryConfig
   function category(
     { plugins, ...categories }: CategorySelection,
     options: CategoryOptions | ScopedCategoryOptions = {}
-  ): Promise<GlobalConfigItem | ScopedConfigItem> {
+  ): GlobalConfigItem | ScopedConfigItem {
     const selected = rules.filter(rule => plugins.includes(toPluginName(rule)))
 
-    return Promise.resolve({
+    return {
       ...options,
       name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
       rules: toRuleMap(selected, categories)
-    })
+    }
   }
 
   return category

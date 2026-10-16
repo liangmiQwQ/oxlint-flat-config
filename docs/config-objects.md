@@ -43,7 +43,7 @@ import { category, defineConfig, globalIgnores } from 'oxlint-flat-config'
 
 export default defineConfig(
   globalIgnores(['dist', 'coverage']),
-  await category({ correctness: 'error', plugins: ['eslint', 'typescript', 'unicorn'] }),
+  category({ correctness: 'error', plugins: ['eslint', 'typescript', 'unicorn'] }),
   {
     name: 'base',
     rules: { 'no-console': 'warn' }

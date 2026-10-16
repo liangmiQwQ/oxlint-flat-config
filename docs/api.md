@@ -81,10 +81,10 @@ Oxlint already skips files listed in `.gitignore`, so you usually only need this
 ## `category`
 
 ```ts
-async function category(
+function category(
   selection: RuleCategories & { plugins: OxlintConfig['plugins'] },
   options?: { name?: string; files?: (string | string[])[]; ignores?: string[] }
-): Promise<FlatConfigItem>
+): FlatConfigItem
 ```
 
 Turns Oxlint rule categories into a config object that sets every rule in them explicitly.
@@ -98,9 +98,9 @@ import preset from 'some-preset'
 export default defineConfig(
   preset,
   // Every correctness rule is an error, even the ones the preset turned off.
-  await category({ correctness: 'error', plugins: ['eslint', 'typescript'] }),
-  await category({ style: 'warn', plugins: ['eslint'] }, { files: ['src/**'] }),
-  await category({ correctness: 'error', plugins: ['react', 'jsx-a11y'] }, { files: ['**/*.tsx'] })
+  category({ correctness: 'error', plugins: ['eslint', 'typescript'] }),
+  category({ style: 'warn', plugins: ['eslint'] }, { files: ['src/**'] }),
+  category({ correctness: 'error', plugins: ['react', 'jsx-a11y'] }, { files: ['**/*.tsx'] })
 )
 ```
 

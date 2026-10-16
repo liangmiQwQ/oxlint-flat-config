@@ -64,20 +64,18 @@ it('checks extensions through variables and nested arrays', () => {
   void (basedExtension satisfies ExtendsItem)
 })
 
-it('accepts helper results in extends', async () => {
+it('accepts helper results in extends', () => {
   defineConfig({
     extends: [
       [globalIgnores(['dist'])],
       includeIgnoreFile('/repo/.gitignore'),
       includeIgnoreFile(['/repo/.gitignore']),
-      await category({ correctness: 'error', plugins: ['eslint'] })
+      category({ correctness: 'error', plugins: ['eslint'] })
     ]
   })
   defineConfig({
     files: ['src/**'],
-    extends: [
-      await category({ correctness: 'error', plugins: ['typescript'] }, { files: ['**/*.ts'] })
-    ]
+    extends: [category({ correctness: 'error', plugins: ['typescript'] }, { files: ['**/*.ts'] })]
   })
 })
 
@@ -86,9 +84,9 @@ it('rejects plugins in config objects', () => {
   void ({ plugins: ['react'], rules: { 'react/jsx-key': 'error' } } satisfies FlatConfigItem)
 })
 
-it('requires plugins in category()', async () => {
+it('requires plugins in category()', () => {
   // @ts-expect-error -- plugins decide which rules are included
-  await category({ correctness: 'error' })
+  category({ correctness: 'error' })
 })
 
 it('accepts flat config in the Vite+ lint block', () => {

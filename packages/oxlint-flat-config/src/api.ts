@@ -23,6 +23,6 @@ export async function createApi(options: GetRulesOptions) {
   return {
     defineConfig: (...configs: ConfigInput[]): OxlintConfig => buildConfig(configs, plugins),
     category,
-    ...(await createPresets(category, plugins))
+    ...createPresets(category, plugins)
   }
 }
