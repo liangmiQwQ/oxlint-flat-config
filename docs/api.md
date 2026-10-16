@@ -108,7 +108,7 @@ export default defineConfig(
 
 Pass `files` to scope it, and `ignores` to exclude files from that scope. The default name lists the categories, like `category correctness, perf`. The result can also be used in `extends`.
 
-`category` runs the installed `oxlint` to get the rule list, so it is async. The list is loaded once and shared by every call.
+The rule list comes from the installed `oxlint`. It is loaded once, when the package is imported, and shared by every call.
 
 ## Types
 

@@ -29,6 +29,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
+    "./vite-plus": "./dist/vite-plus.mjs",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -46,9 +47,19 @@
     "glob-distribute": "catalog:"
   },
   "devDependencies": {
-    "oxlint": "catalog:"
+    "oxlint": "catalog:",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "oxlint": ">=1.85.0"
+    "oxlint": ">=1.85.0",
+    "vite-plus": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "oxlint": {
+      "optional": true
+    },
+    "vite-plus": {
+      "optional": true
+    }
   }
 }

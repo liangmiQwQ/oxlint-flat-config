@@ -7,6 +7,7 @@ import type {
   GlobalIgnoresItem,
   ScopedConfigItem
 } from '../src/index.ts'
+import { defineConfig as defineViteConfig } from '../src/vite-plus.ts'
 
 it('accepts configs, nested arrays and falsy entries', () => {
   const configs = [
@@ -88,4 +89,12 @@ it('rejects plugins in config objects', () => {
 it('requires plugins in category()', async () => {
   // @ts-expect-error -- plugins decide which rules are included
   await category({ correctness: 'error' })
+})
+
+it('accepts flat config in the Vite+ lint block', () => {
+  defineViteConfig({ lint: [{ files: ['src/**'], rules: { 'no-console': 'warn' } }] })
+  // oxlint-disable-next-line typescript/require-await -- severities returned from async callbacks must stay literal types
+  defineViteConfig(async () => ({ lint: { rules: { 'no-console': 'warn' } } }))
+  // @ts-expect-error -- use category() instead of Oxlint's categories
+  void defineViteConfig({ lint: { categories: { correctness: 'error' } } })
 })

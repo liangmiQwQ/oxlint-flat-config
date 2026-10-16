@@ -1,7 +1,7 @@
-import { getRules } from 'get-oxlint-rules'
 import type { OxlintRule } from 'get-oxlint-rules'
-import type { DummyRuleMap, OxlintConfig, RuleCategories } from 'oxlint'
+import type { DummyRuleMap, RuleCategories } from 'oxlint'
 
+import type { Plugins } from './core/index.ts'
 import type { GlobalConfigItem, ScopedConfigItem } from './core/types.ts'
 
 export interface CategorySelection extends RuleCategories {
@@ -21,42 +21,40 @@ export interface ScopedCategoryOptions extends CategoryOptions {
 
 // Category presets only contain rules and metadata, so they can also be used in extends.
 type CategoryConfig = Pick<GlobalConfigItem, 'name' | 'rules'>
-type Plugins = NonNullable<OxlintConfig['plugins']>
 
-// Shared by every `category()` call, so Oxlint runs at most once per process.
-let rulesPromise: Promise<OxlintRule[]> | undefined
+/** Builds `category()` on top of the rules of one Oxlint copy. */
+export function createCategory(rules: OxlintRule[]) {
+  /**
+   * Turns Oxlint categories into a flat config object with an explicit rule for every rule in them.
+   *
+   * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
+   */
+  function category(
+    selection: CategorySelection,
+    options: ScopedCategoryOptions
+  ): Promise<CategoryConfig & ScopedCategoryOptions>
+  function category(
+    selection: CategorySelection,
+    options?: CategoryOptions
+  ): Promise<CategoryConfig>
+  // Returns a promise to keep the API from when `category()` loaded rules itself.
+  function category(
+    { plugins, ...categories }: CategorySelection,
+    options: CategoryOptions | ScopedCategoryOptions = {}
+  ): Promise<GlobalConfigItem | ScopedConfigItem> {
+    const selected = rules.filter(rule => plugins.includes(toPluginName(rule)))
 
-/**
- * Turns Oxlint categories into a flat config object with an explicit rule for every rule in them.
- *
- * Unlike oxlint's `categories` field, the result follows flat config order: later config objects override it, and it overrides earlier ones.
- */
-export async function category(
-  selection: CategorySelection,
-  options: ScopedCategoryOptions
-): Promise<CategoryConfig & ScopedCategoryOptions>
-export async function category(
-  selection: CategorySelection,
-  options?: CategoryOptions
-): Promise<CategoryConfig>
-export async function category(
-  { plugins, ...categories }: CategorySelection,
-  options: CategoryOptions | ScopedCategoryOptions = {}
-): Promise<GlobalConfigItem | ScopedConfigItem> {
-  const rules = (await loadRules()).filter(rule => plugins.includes(toPluginName(rule)))
-
-  return {
-    ...options,
-    name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
-    rules: toRuleMap(rules, categories)
+    return Promise.resolve({
+      ...options,
+      name: options.name ?? `category ${Object.keys(categories).join(', ')}`,
+      rules: toRuleMap(selected, categories)
+    })
   }
+
+  return category
 }
 
-function loadRules(): Promise<OxlintRule[]> {
-  // Resolve Oxlint from this package, which declares it as a peer dependency, so pnpm's strict layout can't hide it.
-  rulesPromise ??= getRules({ cwd: import.meta.dirname })
-  return rulesPromise
-}
+export type Category = ReturnType<typeof createCategory>
 
 function toRuleMap(rules: OxlintRule[], categories: RuleCategories): DummyRuleMap {
   const entries = rules
