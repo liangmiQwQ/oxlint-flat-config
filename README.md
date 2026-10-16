@@ -38,6 +38,20 @@ Config objects apply in order, so a later object overrides an earlier one, just 
 
 No rules are on until you configure them. Use `recommended` or `all` to start.
 
+## Vite+
+
+With [Vite+](https://viteplus.dev), write the `lint` block of `vite.config.ts` as a flat config array instead. You don't need to install `oxlint`:
+
+```ts
+import { defineConfig, recommended } from 'oxlint-flat-config/vite-plus'
+
+export default defineConfig({
+  lint: [recommended, { rules: { 'no-console': 'warn' } }]
+})
+```
+
+See [Vite+](./docs/vite-plus.md) for details.
+
 ## Composer
 
 When a config comes from a shared preset, you often want to change part of it without copying the whole thing. `@oxlint-flat-config/composer` lets you do that with a chain of steps that find config objects by `name`:
@@ -72,6 +86,7 @@ See [Composer](./docs/composer.md) for every method.
 - [Config objects](./docs/config-objects.md): how each kind of config object turns into Oxlint config.
 - [API](./docs/api.md): `defineConfig`, `globalIgnores`, `includeIgnoreFile`, `category`, `recommended` and `all`.
 - [Composer](./docs/composer.md): the `@oxlint-flat-config/composer` API.
+- [Vite+](./docs/vite-plus.md): writing the `lint` block of `vite.config.ts` as flat config.
 - [Differences from ESLint](./docs/differences-from-eslint.md): what works differently because of Oxlint's config format.
 
 ## Credits
