@@ -87,6 +87,14 @@ See [Composer](./docs/composer.md) for every method.
 - [Using with Vite+](./docs/vite-plus.md): writing the `lint` block of `vite.config.ts` as flat config.
 - [Differences from ESLint](./docs/differences-from-eslint.md): what works differently because of Oxlint's config format.
 
+## Real-world Examples
+
+Flat config is especially useful for config presets.
+
+- [`@liangmi/vp-config`](https://github.com/liangmiQwQ/vp-config)
+
+You can also build your own Vite+ / Oxlint config preset with `oxlint-flat-config`!
+
 ## Credits
 
 Thanks to [ESLint](https://github.com/eslint) team who creates ESLint flat config, which is the foundation of this entire project.
